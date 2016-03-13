@@ -8,7 +8,7 @@
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>979d84a8-e405-476f-be9a-861a5cd6e34e</ProjectGuid>
-    <ProjectTypeGuids>{E53F8FEA-EAE0-44A6-8774-FFD645390401};{349C5851-65DF-11DA-9384-00065B846F21};{F2A71F9B-5D33-465A-A702-920D77279786}</ProjectTypeGuids>
+    <ProjectTypeGuids>{349C5851-65DF-11DA-9384-00065B846F21};{F2A71F9B-5D33-465A-A702-920D77279786}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <RootNamespace>Byteville.Core</RootNamespace>
@@ -123,6 +123,10 @@
     <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\jquery-1.9.0.min.map" />
+    <Content Include="Scripts\jquery-1.9.0.min.js" />
+    <Content Include="Scripts\jquery-1.9.0.js" />
+    <None Include="Scripts\jquery-1.9.0.intellisense.js" />
     <None Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="fonts\glyphicons-halflings-regular.ttf" />
     <None Include="fonts\glyphicons-halflings-regular.svg" />
@@ -131,6 +135,7 @@
     <Compile Include="Controllers\CarsController.fs" />
     <Compile Include="Controllers\ItemsController.fs" />
     <Content Include="Web.config" />
+    <Compile Include="NLogger.fs" />
     <Content Include="Global.asax" />
     <Compile Include="Global.asax.fs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -138,10 +143,18 @@
     <Content Include="Index.html" />
     <Content Include="packages.config" />
     <Content Include="readme.txt" />
+    <None Include="NLog.xsd" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

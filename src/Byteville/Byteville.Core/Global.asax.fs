@@ -5,6 +5,7 @@ open System.Net.Http
 open System.Web
 open System.Web.Http
 open System.Web.Routing
+open System.Web.Http.Tracing
 
 type HttpRoute = {
     controller : string
@@ -26,6 +27,7 @@ type Global() =
         config.Formatters.Remove(config.Formatters.XmlFormatter) |> ignore
         config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver()
 
+        GlobalConfiguration.Configuration.Services.Replace(typeof<ITraceWriter>, new NLogger());
         // Additional Web API settings
 
     member x.Application_Start() =

@@ -1,0 +1,28 @@
+2016-03-13 22:32:09.7130|DEBUG|<StartupCode$Byteville-Core>.$NLogger| System.Web.Http.Controllers WebHostHttpControllerTypeResolver GetControllerTypes
+2016-03-13 22:32:10.5711|DEBUG|<StartupCode$Byteville-Core>.$NLogger| System.Web.Http.Controllers WebHostHttpControllerTypeResolver GetControllerTypes
+2016-03-13 22:32:10.9329|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Request http://localhost:48213/api/cars
+2016-03-13 22:32:10.9529|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers DefaultHttpControllerSelector SelectController Route='controller:cars'
+2016-03-13 22:32:10.9600|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers DefaultHttpControllerSelector SelectController Cars
+2016-03-13 22:32:10.9600|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers HttpControllerDescriptor CreateController
+2016-03-13 22:32:10.9600|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers DefaultHttpControllerActivator Create
+2016-03-13 22:32:10.9700|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers DefaultHttpControllerActivator Create Byteville.Core.Controllers.CarsController
+2016-03-13 22:32:10.9700|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers HttpControllerDescriptor CreateController Byteville.Core.Controllers.CarsController
+2016-03-13 22:32:10.9700|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers CarsController ExecuteAsync
+2016-03-13 22:32:10.9700|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Action ApiControllerActionSelector SelectAction
+2016-03-13 22:32:10.9900|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Action ApiControllerActionSelector SelectAction Selected action 'Get()'
+2016-03-13 22:32:11.0010|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.ModelBinding HttpActionBinding ExecuteBindingAsync
+2016-03-13 22:32:11.0010|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.ModelBinding HttpActionBinding ExecuteBindingAsync
+2016-03-13 22:32:11.0010|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Action ApiControllerActionInvoker InvokeActionAsync Action='Get()'
+2016-03-13 22:32:11.0010|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Action ReflectedHttpActionDescriptor ExecuteAsync Invoking action 'Get()'
+2016-03-13 22:32:11.0180|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Action ReflectedHttpActionDescriptor ExecuteAsync Action returned 'Byteville.Core.Models.Car[]'
+2016-03-13 22:32:11.0180|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Net.Http.Formatting DefaultContentNegotiator Negotiate Type='Car[]', formatters=[JsonMediaTypeFormatterTracer, FormUrlEncodedMediaTypeFormatterTracer, FormUrlEncodedMediaTypeFormatterTracer]
+2016-03-13 22:32:11.0350|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Net.Http.Formatting JsonMediaTypeFormatter GetPerRequestFormatterInstance Obtaining formatter of type 'JsonMediaTypeFormatter' for type='Car[]', mediaType='application/json; charset=utf-8'
+2016-03-13 22:32:11.0350|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Net.Http.Formatting JsonMediaTypeFormatter GetPerRequestFormatterInstance Will use same 'JsonMediaTypeFormatter' formatter
+2016-03-13 22:32:11.0350|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Net.Http.Formatting DefaultContentNegotiator Negotiate Selected formatter='JsonMediaTypeFormatter', content-type='application/json; charset=utf-8'
+2016-03-13 22:32:11.0350|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Action ApiControllerActionInvoker InvokeActionAsync
+2016-03-13 22:32:11.0350|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers CarsController ExecuteAsync
+2016-03-13 22:32:11.0350|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Request Content-type='application/json; charset=utf-8', content-length=unknown
+2016-03-13 22:32:11.0510|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Net.Http.Formatting JsonMediaTypeFormatter WriteToStreamAsync Value='Byteville.Core.Models.Car[]', type='Car[]', content-type='application/json; charset=utf-8'
+2016-03-13 22:32:11.1801|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Net.Http.Formatting JsonMediaTypeFormatter WriteToStreamAsync
+2016-03-13 22:32:11.1801|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers CarsController Dispose
+2016-03-13 22:32:11.1801|INFO|<StartupCode$Byteville-Core>.$NLogger|GET http://localhost:48213/api/cars System.Web.Http.Controllers CarsController Dispose
