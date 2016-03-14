@@ -1,10 +1,25 @@
 ﻿namespace Byteville.Tests
 open Xunit // import namespace
+open Byteville.Core.Controllers
 
 
-type MyTest() = 
-    let add x y = x + y // unit
+type ItemsControllerTests() = 
 
-    [<Fact>]   // test
-    let add_5_to_3_should_be_8() =
-        Assert.Equal(3, add 5 3)
+    [<Fact>]
+    member x.When_Removed_Element_Expect_To_Retrieve_One_Element_Less() =         
+        let controller = new ItemsController()
+        let count = controller.Get().Length
+
+        controller.Delete(0) |> ignore
+
+        Assert.Equal(count - 1, controller.Get().Length)
+
+    [<Fact>]
+    member x.When_Added_Element_Expect_To_Retrieve_One_Element_More() = 
+        let controller = new ItemsController()
+        let count = controller.Get().Length
+        let item = {name="test"; id=3}
+
+        controller.Post(item) |> ignore
+
+        Assert.Equal(count + 1, controller.Get().Length)
