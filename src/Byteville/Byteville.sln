@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Byteville.Core", "Byteville.Core\Byteville.Core.fsproj", "{979D84A8-E405-476F-BE9A-861A5CD6E34E}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Byteville.Tests", "Byteville.Tests\Byteville.Tests.fsproj", "{28E88520-7956-400F-A603-234A48D4A55B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{979D84A8-E405-476F-BE9A-861A5CD6E34E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{979D84A8-E405-476F-BE9A-861A5CD6E34E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{979D84A8-E405-476F-BE9A-861A5CD6E34E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28E88520-7956-400F-A603-234A48D4A55B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28E88520-7956-400F-A603-234A48D4A55B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28E88520-7956-400F-A603-234A48D4A55B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28E88520-7956-400F-A603-234A48D4A55B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
