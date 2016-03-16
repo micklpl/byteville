@@ -10,3 +10,4 @@ artifacts/
 *DS_Store
 *.sln.ide
 src/Byteville/Byteville.Core/log
+src/DataStorage/

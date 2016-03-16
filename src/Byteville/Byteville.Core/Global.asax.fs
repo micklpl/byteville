@@ -28,7 +28,14 @@ type Global() =
         config.Formatters.JsonFormatter.SerializerSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver()
 
         GlobalConfiguration.Configuration.Services.Replace(typeof<ITraceWriter>, new NLogger());
+
+        //Global.InitializeData()
         // Additional Web API settings
 
     member x.Application_Start() =
-        GlobalConfiguration.Configure(Action<_> Global.RegisterWebApi)
+        GlobalConfiguration.Configure(Action<_> Global.RegisterWebApi)        
+
+    static member InitializeData() = 
+        let dataLoader = new DataLoader()
+        dataLoader
+        //dataLoader.IndexStreets() |> ignore
