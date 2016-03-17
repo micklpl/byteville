@@ -4,6 +4,8 @@ open System.IO
 open System.Text.RegularExpressions
 open System.Web
 open Nest
+open System.Net
+open System.Collections.Specialized
 
 [<CLIMutable>]
 type AdministrationUnit = { Name : String;  AllocationCode: String; District: String }
@@ -43,11 +45,17 @@ type DataLoader() =
             |> Array.filter(fun line -> not(Regex.IsMatch(line, ignoredUnits)))            
         matchingLines
 
+    member x.CreateStreetsIndex() =
+        let client = new WebClient()
+        let mapping = """{"mappings":{"administrationunit":{"properties":{"name":{"type":"string","store":"yes","index":"analyzed"},"allocationCode":{"type":"string","store":"yes","index":"not_analyzed"},"district":{"type":"string","store":"yes","index":"not_analyzed"}}}}}"""
+        client.UploadString("http://localhost:9200/streets/", "PUT", mapping)
+
     member x.IndexStreets(path: String) =        
         let node = new Uri("http://localhost:9200")
         let settings = new ConnectionSettings(node)        
         let client = new ElasticClient(settings.DefaultIndex("streets"))
-        
+        x.CreateStreetsIndex() |> ignore
+
         x.LoadAndFilterStreetsFile(path) 
             |> Array.map(fun line -> x.ParseAdministrationUnit(line)) 
             |> client.IndexMany 
