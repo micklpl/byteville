@@ -6,8 +6,46 @@ open System.Net.Http
 open System.Web.Http
 open Newtonsoft.Json
 open Byteville.Core
+open Nest
 
 type SearchController() =
     inherit ApiController()
 
-    member self.Get() = self.Ok()
+    let BuildPrefixQuery(phrase: String) = 
+        let prefixQuery = new PrefixQuery()
+        prefixQuery.Value <- phrase
+        prefixQuery
+
+    let BuildFuzzyQuery(phrase: String) = 
+        let fuzzyQuery = new FuzzyQuery()
+        fuzzyQuery.Value <- phrase
+        fuzzyQuery
+
+    let BuildQuery(name: String, phrase: String, fuzzy: bool) = 
+        let req = new SearchRequest()
+        let queryBase = match fuzzy with
+                        | true -> BuildFuzzyQuery(phrase) :> FieldNameQueryBase
+                        | false -> BuildPrefixQuery(phrase) :> FieldNameQueryBase
+        
+        let field = new Field()
+        field.Name <- name
+        queryBase.Field <- field
+        req.Query <- new QueryContainer(queryBase)
+        req
+
+    let GetElasticClient() = 
+        let node = new Uri("http://localhost:9200")
+        let settings = new ConnectionSettings(node)        
+        new ElasticClient(settings.DefaultIndex("streets"))
+
+    member self.Get([<FromUri>]q :String) =
+        let client = GetElasticClient()
+        let prefixQuery = BuildQuery("name", q, false)
+        let search = fun (client: ElasticClient, query: SearchRequest) -> 
+            client.Search<AdministrationUnit>(query).Documents.ToArray()
+       
+        let result = match search(client, prefixQuery) with
+                        | [||] -> search(client, BuildQuery("name", q, true))
+                        | documents -> documents
+
+        result
