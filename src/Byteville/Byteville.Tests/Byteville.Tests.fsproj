@@ -63,6 +63,7 @@
     <Content Include="packages.config" />
     <Compile Include="ItemsControllerTests.fs" />
     <Compile Include="DataLoadingTests.fs" />
+    <Content Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

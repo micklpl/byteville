@@ -29,7 +29,7 @@ type Global() =
 
         GlobalConfiguration.Configuration.Services.Replace(typeof<ITraceWriter>, new NLogger());
 
-        //Global.InitializeData()
+        Global.InitializeData()
         // Additional Web API settings
 
     member x.Application_Start() =
@@ -37,5 +37,6 @@ type Global() =
 
     static member InitializeData() = 
         let dataLoader = new DataLoader()
-        dataLoader
-        //dataLoader.IndexStreets() |> ignore
+        if not(dataLoader.IndexExists("streets")) then
+            dataLoader.IndexStreets("")
+        ()

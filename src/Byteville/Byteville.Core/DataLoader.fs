@@ -3,10 +3,10 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 open System.Web
+open Nest
 
 [<CLIMutable>]
 type AdministrationUnit = { Name : String;  AllocationCode: String; District: String }
-
 
 type DataLoader() =
     let ignoredUnits = "^(PARK|MOST|KOPIEC|RONDO|\
@@ -42,3 +42,20 @@ type DataLoader() =
             File.ReadAllLines(path)
             |> Array.filter(fun line -> not(Regex.IsMatch(line, ignoredUnits)))            
         matchingLines
+
+    member x.IndexStreets(path: String) =        
+        let node = new Uri("http://localhost:9200")
+        let settings = new ConnectionSettings(node)        
+        let client = new ElasticClient(settings.DefaultIndex("streets"))
+        
+        x.LoadAndFilterStreetsFile(path) 
+            |> Array.map(fun line -> x.ParseAdministrationUnit(line)) 
+            |> client.IndexMany 
+            |> ignore
+
+    member x.IndexExists(name: String) =
+        let node = new Uri("http://localhost:9200")
+        let settings = new ConnectionSettings(node)
+        let client = new ElasticClient(settings.DefaultIndex(name))
+        
+        client.Count<AdministrationUnit>().Count > 0L
