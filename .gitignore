@@ -11,3 +11,4 @@ artifacts/
 *.sln.ide
 src/Byteville/Byteville.Core/log
 src/DataStorage/
+src/Byteville/Byteville.Core/jspm_packages/

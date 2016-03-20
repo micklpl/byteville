@@ -126,6 +126,8 @@
     <Content Include="Scripts\jquery-1.9.0.min.map" />
     <Content Include="Scripts\jquery-1.9.0.min.js" />
     <Content Include="Scripts\jquery-1.9.0.js" />
+    <Content Include="app.html" />
+    <Content Include="package.json" />
     <None Include="Scripts\jquery-1.9.0.intellisense.js" />
     <None Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="fonts\glyphicons-halflings-regular.ttf" />
@@ -152,6 +154,8 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="app.js" />
+    <Content Include="config.js" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Elasticsearch.Net">
