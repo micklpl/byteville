@@ -1,0 +1,13 @@
+﻿<template>
+    <div class="streets-list-container">
+        <ul class="list-group" repeat.for="district of districts">
+            <li class="list-group-item">
+                <a class="reset-anchor" route-href="route: districtDetails; 
+                                   params.bind: {name:district.name}">
+                    <span>${district.name}</span>
+                    <span class="badge float-right">${district.streetsCount}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</template>

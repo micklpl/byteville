@@ -20,11 +20,27 @@
 }
 
 .streets-list-container{
-    width: 400px;
-    margin: 0 auto;   
+    width: 700px; 
+    margin: 0 auto;
+}
+
+.centered-image{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    display: block;    
 }
 
 .streets-list-container li:hover{
     cursor: pointer;
     background-color: gainsboro;
+}
+
+.reset-anchor{
+    text-decoration: none;
+    color: inherit;
+}
+
+.float-right{
+    float: right;
 }
