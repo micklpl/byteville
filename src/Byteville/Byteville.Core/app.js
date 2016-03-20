@@ -1,5 +1,15 @@
-﻿export class App{
+﻿import {HttpClient} from "aurelia-http-client"
+
+export class App{
+
     constructor(){
-        this.message="hello"
+    }
+
+    activate(){
+        var client = new HttpClient();
+        var self = this;
+        client.get("api/districts").then( response => {
+            self.districts = response.content;
+        })
     }
 }

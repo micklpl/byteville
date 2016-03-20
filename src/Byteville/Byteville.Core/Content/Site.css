@@ -18,3 +18,13 @@
     border-radius: 4px 4px 0 0;
     box-shadow: none;
 }
+
+.streets-list-container{
+    width: 400px;
+    margin: 0 auto;   
+}
+
+.streets-list-container li:hover{
+    cursor: pointer;
+    background-color: gainsboro;
+}

@@ -1,5 +1,10 @@
 ﻿<template>
-    <section>
-        <h2>${message}</h2>
-     </section>
+    <div class="streets-list-container">
+        <ul class="list-group" repeat.for="district of districts">
+            <li class="list-group-item">
+                <span class="badge">${district.streetsCount}</span>
+                ${district.name}
+            </li>
+        </ul>
+    </div>
 </template>
