@@ -15,10 +15,13 @@ type District = {name: string; streetsCount: int }
 type DistrictsController() =
     inherit ApiController()
 
-    member x.Get() =
+    let GetElasticClient() = 
         let node = new Uri("http://localhost:9200")
         let settings = new ConnectionSettings(node)        
-        let client = new ElasticClient(settings.DefaultIndex("streets"))
+        new ElasticClient(settings.DefaultIndex("streets"))
+
+    member x.Get() =      
+        let client = GetElasticClient()
 
         let searchRequest = new SearchRequest()
         let dictionary = new Dictionary<string, IAggregationContainer>()
@@ -39,3 +42,18 @@ type DistrictsController() =
 
         client.Search<AdministrationUnit>(searchRequest).Aggs.Terms("districts_by_popularity").Buckets.ToArray()
         |> Array.map(fun d -> { name = d.Key; streetsCount = int32(d.DocCount.Value); })
+
+    member self.Get(id: string)  =  
+        let client = GetElasticClient()
+
+        let searchRequest = new SearchRequest()
+        let termQuery = TermQuery()
+        let field = new Field()
+        field.Name <- "district"
+        termQuery.Field <- field
+        termQuery.Value <- id
+        searchRequest.Query <- new QueryContainer(termQuery)
+        searchRequest.Size <- System.Nullable<int>(300)
+         
+        client.Search<AdministrationUnit>(searchRequest).Documents.ToArray()
+        |> Array.map(fun doc -> doc.Name)

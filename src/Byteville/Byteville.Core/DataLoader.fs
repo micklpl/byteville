@@ -31,7 +31,11 @@ type DataLoader() =
         if nameWithBracketsMatch.Groups.Count = 3 then
             name <- nameWithBracketsMatch.Groups.[1].Value
 
-        {Name = name.TrimEnd();  AllocationCode = matchResult.Groups.[3].Value; District = matchResult.Groups.[4].Value}
+        {
+            Name = name.TrimEnd();  
+            AllocationCode = matchResult.Groups.[3].Value; 
+            District = matchResult.Groups.[4].Value.TrimEnd()
+        }
 
     
     member x.MatchPattern with get() = matchPattern
