@@ -14,6 +14,12 @@
               name: 'districtDetails', 
               moduleId: './Modules/districtDetails', 
               nav: false 
+          },
+          { 
+              route: 'streetsSearch', 
+              name: 'streetsSearch', 
+              moduleId: './Modules/streetsSearch', 
+              nav: false 
           }
         ]);
 
