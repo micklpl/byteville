@@ -15,4 +15,13 @@ export class Map{
             }
         })
     }
+
+    selectDistrict($event){
+        $event.srcElement.classList.add("pulsar-animation");
+    }
+
+    leaveDistrict($event){
+        $event.srcElement.classList.remove("pulsar-animation");
+    }
+
 }

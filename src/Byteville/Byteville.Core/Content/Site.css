@@ -71,3 +71,31 @@
 .fil0 {
     fill: #F7C5B4;
 }
+
+@-webkit-keyframes pulsar {
+  0%   { opacity: 1; }
+  50%   { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+@-moz-keyframes pulsar {
+  0%   { opacity: 1; }
+  50%   { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+@-o-keyframes pulsar {
+  0%   { opacity: 1; }
+  50%   { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+@keyframes pulsar {
+  0%   { opacity: 1; }
+  50%   { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.pulsar-animation {
+  -webkit-animation: pulsar 1.4s infinite; /* Safari 4+ */
+  -moz-animation:    pulsar 1.4s infinite; /* Fx 5+ */
+  -o-animation:      pulsar 1.4s infinite; /* Opera 12+ */
+  animation:         pulsar 1.4s infinite; /* IE 10+, Fx 29+ */
+}
