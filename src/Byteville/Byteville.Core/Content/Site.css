@@ -53,3 +53,21 @@
     width: 800px;
     line-height: 1.5px;
 }
+
+.str1 {
+    stroke: #75C5F0;
+    stroke-width: 1588;
+}
+
+.fil1 {
+    fill: none;
+}
+
+.str0 {
+    stroke: #FFFFFF;
+    stroke-width: 529;
+}
+
+.fil0 {
+    fill: #F7C5B4;
+}

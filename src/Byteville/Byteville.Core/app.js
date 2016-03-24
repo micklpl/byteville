@@ -20,6 +20,12 @@
               name: 'streetsSearch', 
               moduleId: './Modules/streetsSearch', 
               nav: false 
+          },
+          { 
+              route: 'map', 
+              name: 'map', 
+              moduleId: './Modules/map', 
+              nav: false 
           }
         ]);
 
