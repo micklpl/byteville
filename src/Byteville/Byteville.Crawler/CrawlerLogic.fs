@@ -3,6 +3,7 @@ open System
 open System.Net
 open System.IO
 open FSharp.Data
+open System.Text.RegularExpressions
 
 let olxAdverts = 
     seq { 
@@ -36,6 +37,7 @@ let gumtreeAdverts =
 
 let downloadHtmlAsync(url:string) =
     async {
+
             let req = WebRequest.Create(url)
             let! rsp = req.AsyncGetResponse()
             return rsp.GetResponseStream()
@@ -51,4 +53,29 @@ let parseOlx(stream:Stream) =
         |> Seq.map(fun link -> (link.Split[|'#'|]).[0])
         |> Seq.filter(fun link -> link.StartsWith("http://olx.pl/oferta/"))
         |> Seq.distinct
-//        |> fun item -> item.ToString
+
+let parseMorizon(stream:Stream) = 
+    let html = HtmlDocument.Load(stream)
+    
+    html.Descendants["div"]
+        |> Seq.filter(fun t-> t.HasAttribute("class", "listingBox mainBox propertyListingBox"))
+        |> Seq.head
+        |> fun table -> table.Descendants["a"]
+        |> Seq.map(fun a -> a.AttributeValue("href"))
+        |> Seq.toArray
+        |> Seq.filter(fun link -> link.StartsWith("http://www.morizon.pl/oferta/"))
+        |> Seq.distinct
+
+let streamToString(stream:Stream) = 
+    use reader  = new StreamReader(stream)
+    reader.ReadToEnd()
+
+let parseGumtree(stream:Stream) =
+    let html = stream |> streamToString
+    let pattern = "href=\"\/(.*)\">"
+    let correctLinkPart = "a-mieszkania-i-domy-sprzedam-i-kupie"
+    Regex.Matches(html, pattern) 
+        |> Seq.cast<Match> 
+        |> Seq.map(fun regMatch -> regMatch.Groups.[1].Value)
+        |> Seq.filter(fun link -> link.Contains(correctLinkPart))
+        |> Seq.map(fun link -> "http://www.gumtree.pl/" + link)
