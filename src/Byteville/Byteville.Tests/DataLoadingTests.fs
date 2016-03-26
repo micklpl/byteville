@@ -45,7 +45,6 @@ type DataLoadingTests() =
         let strLine = "ALEJA GENERAŁA WŁADYSŁAWA ANDERSA (do ul.Braci Schindlerów) brak zabudowy ŚR Grzegórzki";
         let dataLoader = new DataLoader()
 
-
         let result = dataLoader.ParseAdministrationUnit(strLine)
 
         let areEqual = (result = { Name = "ALEJA GENERAŁA WŁADYSŁAWA ANDERSA"; AllocationCode = "ŚR"; District = "Grzegórzki" })

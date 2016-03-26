@@ -1,5 +1,5 @@
 ﻿namespace Byteville.Tests
-open Xunit // import namespace
+open Xunit
 open Byteville.Core.Controllers
 
 
