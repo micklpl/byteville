@@ -14,8 +14,8 @@ type CrawlerTests() =
         let expSuffix = ".html"
 
         //Act
-        let stream = Async.RunSynchronously(downloadHtmlAsync(url))
-        let links = parseOlx(stream)
+        let stream = downloadHtmlAsync(url)
+        let links = Async.RunSynchronously(parseOlx(stream))
 
         //Assert
         let areLinksCorrect = links 
@@ -31,8 +31,8 @@ type CrawlerTests() =
         let expSuffix = ".html"
 
         //Act
-        let stream = Async.RunSynchronously(downloadHtmlAsync(url))
-        let links = parseOlx(stream)
+        let stream = downloadHtmlAsync(url)
+        let links = Async.RunSynchronously(parseOlx(stream))
 
         //Assert
         let areLinksCorrect = links 
@@ -46,8 +46,8 @@ type CrawlerTests() =
         let expPrefix = "http://www.morizon.pl/oferta/"
 
         //Act
-        let stream = Async.RunSynchronously(downloadHtmlAsync(url))
-        let links = parseMorizon(stream)
+        let stream = downloadHtmlAsync(url)
+        let links = Async.RunSynchronously(parseMorizon(stream))
 
         //Assert
         let areLinksCorrect = links |> Seq.forall(fun d -> d.StartsWith(expPrefix))       
@@ -60,8 +60,8 @@ type CrawlerTests() =
         let expPrefix = "http://www.morizon.pl/oferta/"
 
         //Act
-        let stream = Async.RunSynchronously(downloadHtmlAsync(url))
-        let links = parseMorizon(stream)
+        let stream = downloadHtmlAsync(url)
+        let links = Async.RunSynchronously(parseMorizon(stream))
 
         //Assert
         let areLinksCorrect = links |> Seq.forall(fun d -> d.StartsWith(expPrefix))       
@@ -74,8 +74,8 @@ type CrawlerTests() =
         let expPrefix = "http://www.gumtree.pl/a-mieszkania-i-domy-sprzedam-i-kupie/krakow/"
 
         //Act
-        let stream = Async.RunSynchronously(downloadHtmlAsync(url))
-        let links = parseGumtree(stream)
+        let stream = downloadHtmlAsync(url)
+        let links = Async.RunSynchronously(parseGumtree(stream))
 
         //Assert
         let areLinksCorrect = links |> Seq.forall(fun d -> d.StartsWith(expPrefix))       
@@ -88,8 +88,8 @@ type CrawlerTests() =
         let expPrefix = "http://www.gumtree.pl/a-mieszkania-i-domy-sprzedam-i-kupie/krakow/"
 
         //Act
-        let stream = Async.RunSynchronously(downloadHtmlAsync(url))
-        let links = parseGumtree(stream)
+        let stream = downloadHtmlAsync(url)
+        let links = Async.RunSynchronously(parseGumtree(stream))
 
         //Assert
         let areLinksCorrect = links |> Seq.forall(fun d -> d.StartsWith(expPrefix))       

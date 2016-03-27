@@ -4,4 +4,5 @@
 [<EntryPoint>]
 let main argv = 
     printfn "%A" argv
+    Async.RunSynchronously(Byteville.CrawlerLogic.crawl(1))
     0 // return an integer exit code

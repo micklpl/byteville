@@ -37,45 +37,96 @@ let gumtreeAdverts =
 
 let downloadHtmlAsync(url:string) =
     async {
-
             let req = WebRequest.Create(url)
-            let! rsp = req.AsyncGetResponse()
+            do! Async.Sleep(200)
+            let! rsp = req.AsyncGetResponse()            
             return rsp.GetResponseStream()
           }
 
-let parseOlx(stream:Stream) = 
-    let html = HtmlDocument.Load(stream)
-    html.Descendants["table"]
-        |> Seq.filter(fun t -> t.HasAttribute("id", "offers_table"))
-        |> Seq.head
-        |> fun table -> table.Descendants["a"]
-        |> Seq.map(fun a -> a.AttributeValue("href"))
-        |> Seq.map(fun link -> (link.Split[|'#'|]).[0])
-        |> Seq.filter(fun link -> link.StartsWith("http://olx.pl/oferta/"))
-        |> Seq.distinct
+let parseOlx(streamAsync:Async<Stream>) = 
+    async{
+        let! stream = streamAsync
+        let html = HtmlDocument.Load(stream)
+        return html.Descendants["table"]
+            |> Seq.filter(fun t -> t.HasAttribute("id", "offers_table"))
+            |> Seq.head
+            |> fun table -> table.Descendants["a"]
+            |> Seq.map(fun a -> a.AttributeValue("href"))
+            |> Seq.map(fun link -> (link.Split[|'#'|]).[0])
+            |> Seq.filter(fun link -> link.StartsWith("http://olx.pl/oferta/"))
+            |> Seq.distinct
+    }
 
-let parseMorizon(stream:Stream) = 
-    let html = HtmlDocument.Load(stream)
-    
-    html.Descendants["div"]
-        |> Seq.filter(fun t-> t.HasAttribute("class", "listingBox mainBox propertyListingBox"))
-        |> Seq.head
-        |> fun table -> table.Descendants["a"]
-        |> Seq.map(fun a -> a.AttributeValue("href"))
-        |> Seq.toArray
-        |> Seq.filter(fun link -> link.StartsWith("http://www.morizon.pl/oferta/"))
-        |> Seq.distinct
+
+let parseMorizon(streamAsync:Async<Stream>) = 
+    async{
+        let! stream = streamAsync
+        let html = HtmlDocument.Load(stream)    
+        return html.Descendants["div"]
+            |> Seq.filter(fun t-> t.HasAttribute("class", "listingBox mainBox propertyListingBox"))
+            |> Seq.head
+            |> fun table -> table.Descendants["a"]
+            |> Seq.map(fun a -> a.AttributeValue("href"))
+            |> Seq.toArray
+            |> Seq.filter(fun link -> link.StartsWith("http://www.morizon.pl/oferta/"))
+            |> Seq.distinct
+    }
 
 let streamToString(stream:Stream) = 
     use reader  = new StreamReader(stream)
     reader.ReadToEnd()
 
-let parseGumtree(stream:Stream) =
-    let html = stream |> streamToString
-    let pattern = "href=\"\/(.*)\">"
-    let correctLinkPart = "a-mieszkania-i-domy-sprzedam-i-kupie"
-    Regex.Matches(html, pattern) 
-        |> Seq.cast<Match> 
-        |> Seq.map(fun regMatch -> regMatch.Groups.[1].Value)
-        |> Seq.filter(fun link -> link.Contains(correctLinkPart))
-        |> Seq.map(fun link -> "http://www.gumtree.pl/" + link)
+let parseGumtree(streamAsync:Async<Stream>) =
+    async{
+        let! stream = streamAsync    
+        let html = stream |> streamToString
+        let pattern = "href=\"\/(.*)\">"
+        let correctLinkPart = "a-mieszkania-i-domy-sprzedam-i-kupie"
+        return Regex.Matches(html, pattern) 
+            |> Seq.cast<Match> 
+            |> Seq.map(fun regMatch -> regMatch.Groups.[1].Value)
+            |> Seq.filter(fun link -> link.Contains(correctLinkPart))
+            |> Seq.map(fun link -> "http://www.gumtree.pl/" + link)
+    }
+
+let md5 (text : string) : string =
+    let data = System.Text.Encoding.UTF8.GetBytes(text)
+    use md5 = System.Security.Cryptography.MD5.Create()
+    (System.Text.StringBuilder(), md5.ComputeHash(data))
+    ||> Array.fold (fun sb b -> sb.Append(b.ToString("x2")))
+    |> string
+
+let basePath = @"C:/mydir/Projekty/ByteVIlle/src/DataStorage/adverts"
+    
+let saveFileToDisk(asyncStream:Async<Stream>, md5:string) =
+    async{
+        let path = String.Format("{0}/{1}.html", basePath, md5)
+        let! htmlStream = asyncStream 
+        use fileStream = System.IO.File.Create(path)
+        use ms = new MemoryStream()
+        htmlStream.CopyTo(ms)
+        let array = ms.ToArray()
+
+        do! fileStream.AsyncWrite(array, 0, array.Length)
+    } 
+
+let crawl pages = 
+    async{
+        let sites = [(olxAdverts |> Seq.take(pages), parseOlx); 
+                    (morizonAdverts |> Seq.take(pages), parseMorizon); 
+                    (gumtreeAdverts |> Seq.take(pages), parseGumtree)]
+        
+        sites 
+            |> List.map(fun (links, parser) -> 
+                (links |> Seq.map(fun link-> downloadHtmlAsync(link) |> parser) |> Async.Parallel)
+                |> Async.RunSynchronously)
+            |> Seq.collect(fun d-> (d |> Seq.concat))
+            |> Seq.map(fun link ->(link, md5(link)))
+            |> Seq.sortBy(fun tuple -> snd(tuple))
+            |> Seq.map(fun tuple -> (downloadHtmlAsync(fst(tuple)), snd(tuple)))
+            |> Seq.map(fun (stream, md5) -> saveFileToDisk(stream, md5))
+            |> Async.Parallel
+            |> Async.RunSynchronously
+            |> ignore
+    }
+    
