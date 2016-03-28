@@ -29,17 +29,21 @@ let gumtreeAdverts =
         let checksum = "v1c9073l3200208a1dwp"
         yield urlBase + checksum + "1"
 
-        let createUrl = fun i -> String.Format("{0}page-{1}/v1c9073l3200208a1dwp{1}", urlBase, i)
+        let createUrl = fun i -> String.Format("{0}page-{1}/{2}{1}", urlBase, i, checksum)
 
         for page in 2 .. 200 do
             yield createUrl(page)
     }
 
+let useTor = false
+
 let downloadHtmlAsync(url:string) =
     async {
             let req = WebRequest.Create(url)
-            do! Async.Sleep(200)
-            let! rsp = req.AsyncGetResponse()            
+            if useTor then
+                req.Proxy <- new WebProxy("127.0.0.1:8118"); 
+            req.Timeout <- 2000
+            let! rsp = req.AsyncGetResponse()          
             return rsp.GetResponseStream()
           }
 
@@ -67,7 +71,6 @@ let parseMorizon(streamAsync:Async<Stream>) =
             |> Seq.head
             |> fun table -> table.Descendants["a"]
             |> Seq.map(fun a -> a.AttributeValue("href"))
-            |> Seq.toArray
             |> Seq.filter(fun link -> link.StartsWith("http://www.morizon.pl/oferta/"))
             |> Seq.distinct
     }
