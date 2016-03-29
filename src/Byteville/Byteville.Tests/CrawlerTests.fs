@@ -2,8 +2,6 @@
 open Xunit
 open Byteville.CrawlerLogic
 
-    
-
 type CrawlerTests() = 
 
     [<Fact>]

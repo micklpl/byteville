@@ -132,4 +132,3 @@ let crawl pages =
             |> Async.RunSynchronously
             |> ignore
     }
-    
