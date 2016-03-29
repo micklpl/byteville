@@ -4,6 +4,7 @@ open System.Net
 open System.IO
 open FSharp.Data
 open System.Text.RegularExpressions
+open System.IO.Compression
 
 let olxAdverts = 
     seq { 
@@ -40,11 +41,22 @@ let useTor = false
 let downloadHtmlAsync(url:string) =
     async {
             let req = WebRequest.Create(url)
+            let gzip = url.StartsWith("http://www.gumtree.pl")
             if useTor then
                 req.Proxy <- new WebProxy("127.0.0.1:8118"); 
+
             req.Timeout <- 2000
-            let! rsp = req.AsyncGetResponse()          
-            return rsp.GetResponseStream()
+
+            if gzip then
+                req.Headers.Add("Accept-Encoding", "gzip")
+                            
+            let! rsp = req.AsyncGetResponse()
+            let mutable stream = rsp.GetResponseStream()
+            
+            if gzip then
+                stream <- new GZipStream(stream, CompressionMode.Decompress)
+                    
+            return stream
           }
 
 let parseOlx(streamAsync:Async<Stream>) = 

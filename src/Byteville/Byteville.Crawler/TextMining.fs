@@ -12,7 +12,7 @@ type Advert = {
     Md5 : String;
     Url: String;
     TotalPrice : decimal<PLN>;
-    PricePerMeter : decimal<PLN>;
+    PricePerMeter : decimal<PLN/m^2>;
     Area : decimal<m^2>;
     NumberOfRooms : int
 }
@@ -54,7 +54,7 @@ let olxAdvertParser(html:HtmlDocument, link:String) =
                 |> Seq.map(fun tr -> (fst(tr).Value, snd(tr).Value))
 
     let pricePerMeter = parseOlxTable(trs, "Cena za m", "strong") |> System.Decimal.Parse 
-                        |> LanguagePrimitives.DecimalWithMeasure<PLN>                        
+                        |> LanguagePrimitives.DecimalWithMeasure<PLN/m^2>                        
 
     let area = parseOlxTable(trs, "Powierzchnia", "strong") |> System.Decimal.Parse 
                         |> LanguagePrimitives.DecimalWithMeasure<m^2>
@@ -70,10 +70,78 @@ let olxAdvertParser(html:HtmlDocument, link:String) =
     
 let morizonAdvertParser(html:HtmlDocument, link:String) =
     let md5 = CrawlerLogic.md5(link)
-    md5
+    let title = html.Descendants("h1") |> Seq.head |> fun h1-> h1.Descendants("strong") 
+                 |> Seq.head |> fun node -> node.InnerText()
+
+    let description = html.Descendants("div") |> Seq.find(fun div -> div.HasAttribute("id", "description"))
+                      |> fun div -> div.InnerText()
+
+    let summaryPrice = html.Descendants("div") 
+                        |> Seq.find(fun div -> div.HasAttribute("class", "summaryPrice"))
+                        |> fun div -> div.Descendants("span")                       
+
+    let price = summaryPrice |> Seq.head |> fun span -> span.InnerText() 
+                             |> fun str -> str.Replace(" ", "").Replace(" zł","")
+                             |> fun str -> str.Replace("&nbsp;","")
+                             |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<PLN>
+
+    let pricePerMeter = summaryPrice |> Seq.item(1) |> fun span -> span.InnerText() 
+                             |> fun str -> (str.Split[|' '|]) |> Seq.head
+                             |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<PLN/m^2>
+
+    let listItems = html.Descendants("li") |> (Seq.map(fun li -> (li.Descendants("span")) |> Seq.tryHead))
+                    |> Seq.filter(fun span -> span.IsSome)
+                    |> Seq.map(fun span -> span.Value)
+                    |> Seq.map(fun span -> (span.InnerText(), span.Descendants("em") |> Seq.tryHead))
+                    |> Seq.filter(fun pair -> (snd(pair).IsSome))
+                    |> Seq.map(fun pair -> (fst(pair), snd(pair).Value))
+
+
+    let area = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Powierzchnia użytkowa"))
+                         |> fun pair -> ((snd(pair)).InnerText().Split[|' '|]).[0]
+                         |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<m^2>
+
+    let roomsNr = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Liczba pokoi"))
+                            |> fun pair -> snd(pair).InnerText() |> System.Int32.Parse
+
+    {
+        Title = title; Description = description; 
+        Md5 = md5; Url = link;
+        TotalPrice = price; PricePerMeter = pricePerMeter; 
+        Area = area; NumberOfRooms = roomsNr
+    }
+
     
-let gumtreeAdvertParser() = 
-    3
+let gumtreeAdvertParser(html:HtmlDocument, link:String) =
+    let md5 = CrawlerLogic.md5(link)
+
+    let title = html.Descendants("h1") |> Seq.head |> fun h1-> h1.Descendants("span") 
+                 |> Seq.head |> fun node -> node.InnerText()
+
+    let description = html.Descendants("div") |> Seq.find(fun div -> div.HasAttribute("class", "description"))
+                      |> fun div -> div.Descendants("span") |> Seq.head |> fun span -> span.InnerText()
+
+    let price = html.Descendants("span") |> Seq.find(fun div -> div.HasAttribute("class", "amount"))
+                |> fun span -> span.InnerText().Replace(" zł","")
+                |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<PLN>
+
+    let listItems = html.Descendants("li") |> (Seq.map(fun li -> (li.Descendants("span"))))
+                    |> Seq.filter(fun span -> Seq.length(span) = 2)
+                    |> Seq.map(fun span -> (Seq.head(span).InnerText(), (span |> Seq.item(1)).InnerText()))
+
+    let area = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Wielkość")) |> fun pair -> snd(pair)
+                         |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<m^2>
+
+    let roomsNr = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Liczba pokoi")) |> fun pair -> snd(pair)
+                            |> fun str -> (str.Split[|' '|]).[0]
+                            |> System.Int32.Parse 
+                         
+    {
+        Title = title; Description = description; 
+        Md5 = md5; Url = link;
+        TotalPrice = price; PricePerMeter = (price/area); 
+        Area = area; NumberOfRooms = roomsNr
+    }
 
 exception NoOgUrlException of string
     
@@ -86,8 +154,8 @@ let classifyAdvert(asyncStream:Async<Stream>) =
                     |> fun node -> node.Attribute("content").Value()
 
         return match ogUrl with
-                    | StartsWith "http://olx.pl" -> olxAdvertParser(html, ogUrl)
-                    | StartsWith "http://morizon.pl" -> raise(NoOgUrlException(ogUrl))
-                    | StartsWith "http://gumtree.pl" -> raise(NoOgUrlException(ogUrl))
-                    | _ -> raise(NoOgUrlException(ogUrl))
+                | StartsWith "http://olx.pl" -> olxAdvertParser(html, ogUrl)
+                | StartsWith "http://www.morizon.pl" -> morizonAdvertParser(html, ogUrl)
+                | StartsWith "http://www.gumtree.pl" -> gumtreeAdvertParser(html, ogUrl)
+                | _ -> raise(NoOgUrlException(ogUrl))
     }      
