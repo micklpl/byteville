@@ -14,7 +14,17 @@ type Advert = {
     TotalPrice : decimal<PLN>;
     PricePerMeter : decimal<PLN/m^2>;
     Area : decimal<m^2>;
-    NumberOfRooms : int
+    NumberOfRooms : int;
+    Furnished : Option<bool>;
+    NewConstruction : Option<bool>;
+    BuildingType : Option<string>;
+    Tier : Option<string>;
+    YearOfConstruction : Option<int>;
+    Elevator : Option<bool>;
+    Basement: Option<bool>;
+    Balcony: Option<bool>;
+    Heating: Option<string>;
+    Parking: Option<string>;
 }
 
 let loadFileFromDisk path = 
@@ -59,14 +69,40 @@ let olxAdvertParser(html:HtmlDocument, link:String) =
     let area = parseOlxTable(trs, "Powierzchnia", "strong") |> System.Decimal.Parse 
                         |> LanguagePrimitives.DecimalWithMeasure<m^2>
 
-    let roomsNr = parseOlxTable(trs, "Liczba pokoi", "a") |> System.Int32.Parse                        
+    let roomsNr = parseOlxTable(trs, "Liczba pokoi", "a") |> System.Int32.Parse
+    let furnished = match parseOlxTable(trs, "Umeblowane", "a") with
+                    | "Tak" -> true
+                    | _ -> false
+                    
+    let newConstruction = match parseOlxTable(trs, "Rynek", "a") with
+                          | "Pierwotny" -> true
+                          | _ -> false
+                          
+    let buildingType = parseOlxTable(trs, "Rodzaj zabudowy", "a") 
+    
+    let tier = parseOlxTable(trs, "Poziom", "a")                 
 
     {
         Title = title; Description = description; 
         Md5 = md5; Url = link;
         TotalPrice = price; PricePerMeter = pricePerMeter; 
-        Area = area; NumberOfRooms = roomsNr
+        Area = area; NumberOfRooms = roomsNr;
+        Furnished = Some furnished; NewConstruction = Some newConstruction;
+        BuildingType = Some buildingType; Tier = Some tier;
+        YearOfConstruction = None; Elevator = None;
+        Basement = None; Balcony = None;
+        Heating = None; Parking = None;
     }
+
+let seekMorizonList(listItems:seq<string*HtmlNode>, desc:String) =
+    listItems |> Seq.find(fun pair -> (fst(pair)).Contains(desc)) 
+        |> (fun pair -> ((snd(pair)).InnerText()))
+
+let polishStringToBoolaen(str) = 
+    match str with
+            | "Tak" -> Some true 
+            | "Nie" -> Some false
+            | _     -> None
     
 let morizonAdvertParser(html:HtmlDocument, link:String) =
     let md5 = CrawlerLogic.md5(link)
@@ -97,18 +133,32 @@ let morizonAdvertParser(html:HtmlDocument, link:String) =
                     |> Seq.map(fun pair -> (fst(pair), snd(pair).Value))
 
 
-    let area = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Powierzchnia użytkowa"))
-                         |> fun pair -> ((snd(pair)).InnerText().Split[|' '|]).[0]
-                         |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<m^2>
+    let area = seekMorizonList(listItems, "Powierzchnia użytkowa")
+                    |> fun text -> (text.Split[|' '|]).[0]
+                    |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<m^2>
 
-    let roomsNr = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Liczba pokoi"))
-                            |> fun pair -> snd(pair).InnerText() |> System.Int32.Parse
+    let roomsNr = seekMorizonList(listItems, "Liczba pokoi") |> System.Int32.Parse
+    let tier = seekMorizonList(listItems, "Piętro")
+    let yearOfConstruction = seekMorizonList(listItems, "Rok budowy") |> System.Int32.Parse
+    let buildingType = seekMorizonList(listItems, "Typ budynku")
+    let newConstruction = if yearOfConstruction >= DateTime.Now.Year then Some true else Some false 
+    let heating = seekMorizonList(listItems, "Ogrzewanie")
+    
+    let elevator = seekMorizonList(listItems, "Winda") |> polishStringToBoolaen
+    let basement = seekMorizonList(listItems, "Piwnica") |> polishStringToBoolaen
+    let balcony = seekMorizonList(listItems, "Balkon") |> polishStringToBoolaen
 
     {
         Title = title; Description = description; 
         Md5 = md5; Url = link;
         TotalPrice = price; PricePerMeter = pricePerMeter; 
-        Area = area; NumberOfRooms = roomsNr
+        Area = area; NumberOfRooms = roomsNr;
+        Furnished = None; NewConstruction = newConstruction;
+        BuildingType = Some buildingType; Tier = Some tier;
+        YearOfConstruction = Some yearOfConstruction;
+        Elevator = elevator; Basement = basement;
+        Balcony = balcony; Heating = Some heating;
+        Parking = None
     }
 
     
@@ -135,12 +185,19 @@ let gumtreeAdvertParser(html:HtmlDocument, link:String) =
     let roomsNr = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Liczba pokoi")) |> fun pair -> snd(pair)
                             |> fun str -> (str.Split[|' '|]).[0]
                             |> System.Int32.Parse 
+
+    let parking = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Parking")) |> fun pair -> snd(pair)
                          
     {
         Title = title; Description = description; 
         Md5 = md5; Url = link;
         TotalPrice = price; PricePerMeter = (price/area); 
-        Area = area; NumberOfRooms = roomsNr
+        Area = area; NumberOfRooms = roomsNr;
+        Furnished = None; NewConstruction = None;
+        BuildingType = None; Tier = None;
+        YearOfConstruction = None; Elevator = None;
+        Basement = None; Balcony = None;
+        Heating = None; Parking = Some parking;
     }
 
 exception NoOgUrlException of string

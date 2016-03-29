@@ -11,7 +11,6 @@ type ClassifierTests() =
         //Arrange
         let filePath = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/adverts/dfeb3cbf0e34c2f5c4583dad96a5c991.html"
 
-
         //Act
         let stream = Byteville.TextMining.loadFileFromDisk(filePath)
         let data = Async.RunSynchronously(Byteville.TextMining.classifyAdvert(stream))
