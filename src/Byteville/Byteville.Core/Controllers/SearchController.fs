@@ -38,6 +38,11 @@ type SearchController() =
         let settings = new ConnectionSettings(node)        
         new ElasticClient(settings.DefaultIndex("streets"))
 
+    member self.PrefixSearch(q:String) = 
+        let client = GetElasticClient()
+        let prefixQuery = BuildQuery("name", q, false)
+        client.Search<AdministrationUnit>(prefixQuery).Documents.ToArray()
+
     member self.Get([<FromUri>]q :String) =
         let client = GetElasticClient()
         let prefixQuery = BuildQuery("name", q, false)

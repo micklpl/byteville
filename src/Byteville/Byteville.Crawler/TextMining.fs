@@ -293,10 +293,26 @@ let tryParseStreetByNeighbours tokens =
         | -1 -> None
         | index -> tryGetItem(tokens, index + 1)
 
+// http://www.wordcounter.com/
+let popularWords = ["osiedle"; "ulica"; "kraków"; "aleja"; "mieszkanie"; "pokoje"; "sprzedam"; "centrum"; 
+                    "huta"; "bronowice"; "dębniki"; "pokojowe"; "podgórze"; "prądnik"; "miasto"; "krowodrza";
+                    "ruczaj"; "mistrzejowice"; "czerwony"; "biały"; "prokocim"; "bieżanów"] 
+
+let removeUnnecessaryWords(tokens: String[]) = 
+    tokens |> Seq.filter(fun token -> token.Length > 2)
+           |> Seq.filter(fun token -> not(popularWords |> List.contains(token)))
+
+let blindSearch tokens = 
+    tokens |> removeUnnecessaryWords
+           |> Seq.map(fun token -> searchController.PrefixSearch(token))
+           |> Seq.filter(fun res -> res.Length = 1)
+           |> Seq.map(fun res -> res |>Seq.head)
+           |> Seq.tryHead
+
 let tryParseStreet(title:String) = 
-    let tokens = title.Replace(".","").Replace(",","").ToLower().Split[|' '|]
+    let tokens = title.Replace(".","").Replace(",","").Replace("-", " ").ToLower().Split[|' '|]
     match tryParseStreetByNeighbours(tokens) with
-        | None -> None
-        | Some(street) -> match searchController.Get(street) with
+        | None -> blindSearch(tokens)
+        | Some(street) -> match searchController.PrefixSearch(street) with
                                 | [|x|] -> Some(x)
-                                | _ -> None
+                                | _ -> blindSearch(tokens)

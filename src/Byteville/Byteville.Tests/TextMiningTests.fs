@@ -63,20 +63,29 @@ type ClassifierTests() =
         Assert.NotEmpty(adverts)
 
     [<Fact>]
-    member x.Temp_Test() = 
+    member x.StreetsParser_Helper() = 
         let file = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/titles.txt"
         let titles = System.IO.File.ReadAllLines(file)
-                        |> Seq.map(fun title -> Byteville.TextMining.tryParseStreet(title))
-                        |> Seq.filter(fun ad -> ad.IsSome)
-                        |> Seq.toArray                        
-
-        Assert.NotEmpty(titles)
+                        |> Seq.map(fun title -> (Byteville.TextMining.tryParseStreet(title)), title)
+          
+        let found = titles 
+                        |> Seq.filter(fun ad -> fst(ad).IsSome)
+                        |> Seq.map(fun pair -> ((fst(pair).Value.Name)+ ", " + snd(pair)))
+                        |> Seq.toArray
+                        |> String.concat "\n"               
+                        
+        let nones = titles |> Seq.filter(fun ad -> fst(ad).IsNone)
+                            |> Seq.map(fun pair -> snd(pair))
+                            |> String.concat "\n"  
+       
+        Assert.NotEmpty(found)
 
     [<Theory>]
     [<InlineData("Mieszkanie 68m2, Prądnik Biały, ul. Natansona", "ULICA WŁADYSŁAWA NATANSONA")>]
     [<InlineData("2 pokoje, 49 m2, os. Sportowe, Nowa Huta", "OSIEDLE SPORTOWE")>]  
     [<InlineData("Kraków, Nowa Huta, Osiedle Urocze, os.Urocze", "OSIEDLE UROCZE")>]
-    [<InlineData("Mieszkanie bezpośrednio Kraków Ruczaj Ulica Pszczelna + gratis", "ULICA PSZCZELNA")>]    
+    [<InlineData("Mieszkanie bezpośrednio Kraków Ruczaj Ulica Pszczelna + gratis", "ULICA PSZCZELNA")>]
+    [<InlineData("Mieszkanie jednopokojowe - Bochenka", "ULICA ADAMA BOCHENKA")>]    
     member x.StreetsParser_Test(title:string, expStreetName:string) =
         
         let output =  Byteville.TextMining.tryParseStreet(title)
