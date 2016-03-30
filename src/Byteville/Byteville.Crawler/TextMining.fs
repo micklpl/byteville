@@ -3,6 +3,7 @@ open System.IO
 open FSharp.Data
 open System
 open FSharp.Data.UnitSystems.SI.UnitSymbols
+open System.Text.RegularExpressions
 
 [<Measure>] type PLN
 
@@ -25,6 +26,9 @@ type Advert = {
     Balcony: Option<bool>;
     Heating: Option<string>;
     Parking: Option<string>;
+
+    mutable Street: Option<string>;
+    mutable District: Option<string>;
 }
 
 exception IncorrectAdvert of string
@@ -269,3 +273,30 @@ let classifyAdvert(asyncStream:Async<Stream>) =
         with
             |  :? IncorrectAdvert -> return None
     }
+
+let searchController = new Byteville.Core.Controllers.SearchController()
+
+let neighboursPattern = "(ul|ulica|al|aleja|os|osiedle)"
+
+let findNeighbourhoodWords(tokens:string[]) = 
+    Array.FindIndex(tokens, fun token -> Regex.IsMatch(token, neighboursPattern))
+
+let tryGetItem(tokens:string[], index:int) =
+    if index >= tokens.Length then 
+        None 
+    else 
+        let item = Array.item(index) <| tokens
+        if item.Length > 2 then Some(item) else None 
+
+let tryParseStreetByNeighbours tokens =     
+    match findNeighbourhoodWords(tokens) with
+        | -1 -> None
+        | index -> tryGetItem(tokens, index + 1)
+
+let tryParseStreet(title:String) = 
+    let tokens = title.Replace(".","").Replace(",","").ToLower().Split[|' '|]
+    match tryParseStreetByNeighbours(tokens) with
+        | None -> None
+        | Some(street) -> match searchController.Get(street) with
+                                | [|x|] -> Some(x)
+                                | _ -> None

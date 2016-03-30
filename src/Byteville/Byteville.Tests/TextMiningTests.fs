@@ -3,6 +3,7 @@ open Xunit
 open Byteville.CrawlerLogic
 open FSharp.Data.UnitSystems.SI.UnitSymbols
 open Byteville.TextMining
+open Swensen.Unquote
 
 type ClassifierTests() = 
     
@@ -39,16 +40,16 @@ type ClassifierTests() =
     [<Fact>]
     member x.GumtreeAdvertsParserTest() =
         //Arrange
-        let filePath = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/adverts/6b0cbc6a9cbe4630b394033ce9dc2f2c.html"
+        let filePath = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/adverts/4ddb9b4def56994e5dd17e2e244bb7c8.html"
 
         //Act
         let stream = Byteville.TextMining.loadFileFromDisk(filePath)
         let data = Async.RunSynchronously(Byteville.TextMining.classifyAdvert(stream)).Value
 
         //Assert      
-        Assert.True(data.Area = 111M<m^2>)
-        Assert.True(data.NumberOfRooms = Some 5)
-        Assert.True(data.TotalPrice = 720000M<PLN>)
+        Assert.True(data.Area = 36M<m^2>)
+        Assert.True(data.NumberOfRooms = None)
+        Assert.True(data.TotalPrice = 220000M<PLN>)
     
     [<Fact>]
     member x.Parsing_Without_Errors_Test() = 
@@ -60,6 +61,29 @@ type ClassifierTests() =
                         |> Seq.toArray
 
         Assert.NotEmpty(adverts)
+
+    [<Fact>]
+    member x.Temp_Test() = 
+        let file = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/titles.txt"
+        let titles = System.IO.File.ReadAllLines(file)
+                        |> Seq.map(fun title -> Byteville.TextMining.tryParseStreet(title))
+                        |> Seq.filter(fun ad -> ad.IsSome)
+                        |> Seq.toArray                        
+
+        Assert.NotEmpty(titles)
+
+    [<Theory>]
+    [<InlineData("Mieszkanie 68m2, Prądnik Biały, ul. Natansona", "ULICA WŁADYSŁAWA NATANSONA")>]
+    [<InlineData("2 pokoje, 49 m2, os. Sportowe, Nowa Huta", "OSIEDLE SPORTOWE")>]  
+    [<InlineData("Kraków, Nowa Huta, Osiedle Urocze, os.Urocze", "OSIEDLE UROCZE")>]
+    [<InlineData("Mieszkanie bezpośrednio Kraków Ruczaj Ulica Pszczelna + gratis", "ULICA PSZCZELNA")>]    
+    member x.StreetsParser_Test(title:string, expStreetName:string) =
+        
+        let output =  Byteville.TextMining.tryParseStreet(title)
+
+        test <@ output.Value.Name = expStreetName @>
+        
+
 
 
         
