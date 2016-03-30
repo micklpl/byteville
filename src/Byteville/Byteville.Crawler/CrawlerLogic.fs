@@ -130,7 +130,7 @@ let crawl pages =
         let sites = [(olxAdverts |> Seq.take(pages), parseOlx); 
                     (morizonAdverts |> Seq.take(pages), parseMorizon); 
                     (gumtreeAdverts |> Seq.take(pages), parseGumtree)]
-        
+       
         sites 
             |> List.map(fun (links, parser) -> 
                 (links |> Seq.map(fun link-> downloadHtmlAsync(link) |> parser) |> Async.Parallel)

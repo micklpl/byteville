@@ -13,12 +13,12 @@ type ClassifierTests() =
 
         //Act
         let stream = Byteville.TextMining.loadFileFromDisk(filePath)
-        let data = Async.RunSynchronously(Byteville.TextMining.classifyAdvert(stream))
+        let data = Async.RunSynchronously(Byteville.TextMining.classifyAdvert(stream)).Value
 
         //Assert      
         Assert.True(data.Area = 38M<m^2>)
         Assert.True(data.PricePerMeter = 5526.32M<PLN/m^2>)
-        Assert.True(data.NumberOfRooms = 3)
+        Assert.True(data.NumberOfRooms = Some 3)
         Assert.True(data.TotalPrice = 210000M<PLN>)
 
     [<Fact>]
@@ -28,12 +28,12 @@ type ClassifierTests() =
 
         //Act
         let stream = Byteville.TextMining.loadFileFromDisk(filePath)
-        let data = Async.RunSynchronously(Byteville.TextMining.classifyAdvert(stream))
+        let data = Async.RunSynchronously(Byteville.TextMining.classifyAdvert(stream)).Value
 
         //Assert      
         Assert.True(data.Area = 29.88M<m^2>)
         Assert.True(data.PricePerMeter = 8133M<PLN/m^2>)
-        Assert.True(data.NumberOfRooms = 1)
+        Assert.True(data.NumberOfRooms = Some 1)
         Assert.True(data.TotalPrice = 243000M<PLN>)
 
     [<Fact>]
@@ -43,12 +43,23 @@ type ClassifierTests() =
 
         //Act
         let stream = Byteville.TextMining.loadFileFromDisk(filePath)
-        let data = Async.RunSynchronously(Byteville.TextMining.classifyAdvert(stream))
+        let data = Async.RunSynchronously(Byteville.TextMining.classifyAdvert(stream)).Value
 
         //Assert      
         Assert.True(data.Area = 111M<m^2>)
-        Assert.True(data.NumberOfRooms = 5)
+        Assert.True(data.NumberOfRooms = Some 5)
         Assert.True(data.TotalPrice = 720000M<PLN>)
+    
+    [<Fact>]
+    member x.Parsing_Without_Errors_Test() = 
+        let dir = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/adverts/"
+        let adverts = new System.IO.DirectoryInfo(dir) |> fun di -> di.EnumerateFiles()
+                        |> Seq.map(fun file -> Byteville.TextMining.loadFileFromDisk(file.FullName))
+                        |> Seq.map(fun stream -> Byteville.TextMining.classifyAdvert(stream))
+                        |> Async.Parallel |> Async.RunSynchronously
+                        |> Seq.toArray
+
+        Assert.NotEmpty(adverts)
 
 
         

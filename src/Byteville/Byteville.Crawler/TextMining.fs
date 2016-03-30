@@ -14,7 +14,7 @@ type Advert = {
     TotalPrice : decimal<PLN>;
     PricePerMeter : decimal<PLN/m^2>;
     Area : decimal<m^2>;
-    NumberOfRooms : int;
+    NumberOfRooms : Option<int>;
     Furnished : Option<bool>;
     NewConstruction : Option<bool>;
     BuildingType : Option<string>;
@@ -26,6 +26,8 @@ type Advert = {
     Heating: Option<string>;
     Parking: Option<string>;
 }
+
+exception IncorrectAdvert of string
 
 let loadFileFromDisk path = 
     async{
@@ -80,46 +82,77 @@ let olxAdvertParser(html:HtmlDocument, link:String) =
                           
     let buildingType = parseOlxTable(trs, "Rodzaj zabudowy", "a") 
     
-    let tier = parseOlxTable(trs, "Poziom", "a")                 
+    let tier = 
+        try
+            Some(parseOlxTable(trs, "Poziom", "a"))
+        with 
+            |  :? System.Collections.Generic.KeyNotFoundException -> None
 
     {
         Title = title; Description = description; 
         Md5 = md5; Url = link;
         TotalPrice = price; PricePerMeter = pricePerMeter; 
-        Area = area; NumberOfRooms = roomsNr;
+        Area = area; NumberOfRooms = Some roomsNr;
         Furnished = Some furnished; NewConstruction = Some newConstruction;
-        BuildingType = Some buildingType; Tier = Some tier;
+        BuildingType = Some buildingType; Tier = tier;
         YearOfConstruction = None; Elevator = None;
         Basement = None; Balcony = None;
         Heating = None; Parking = None;
+        District = None; Street = None;
     }
 
 let seekMorizonList(listItems:seq<string*HtmlNode>, desc:String) =
     listItems |> Seq.find(fun pair -> (fst(pair)).Contains(desc)) 
         |> (fun pair -> ((snd(pair)).InnerText()))
 
+let trySeekMorizonList(listItems:seq<string*HtmlNode>, desc:String) = 
+    try
+        Some(seekMorizonList(listItems, desc))
+    with 
+        |  :? System.Collections.Generic.KeyNotFoundException -> None    
+
 let polishStringToBoolaen(str) = 
     match str with
             | "Tak" -> Some true 
             | "Nie" -> Some false
             | _     -> None
+
+let trySeekMorizonListForBoolean(listItems:seq<string*HtmlNode>, desc:String) =
+    match trySeekMorizonList(listItems, desc) with
+        | Some(x) -> polishStringToBoolaen(x)
+        | None -> None
+
+let trySeekMorizonListForInt(listItems:seq<string*HtmlNode>, desc:String) =
+    match trySeekMorizonList(listItems, desc) with
+        | Some(x) -> Some(System.Int32.Parse(x))
+        | None -> None
+
     
 let morizonAdvertParser(html:HtmlDocument, link:String) =
     let md5 = CrawlerLogic.md5(link)
     let title = html.Descendants("h1") |> Seq.head |> fun h1-> h1.Descendants("strong") 
                  |> Seq.head |> fun node -> node.InnerText()
 
-    let description = html.Descendants("div") |> Seq.find(fun div -> div.HasAttribute("id", "description"))
-                      |> fun div -> div.InnerText()
+    let descriptionDiv = html.Descendants("div") |> Seq.find(fun div -> div.HasAttribute("id", "description"))
+
+    let descriptionSpan = descriptionDiv.Descendants("span") |> Seq.tryHead
+
+    let description = match descriptionSpan with
+                        | Some(span) -> span.InnerText()
+                        | None -> descriptionDiv.InnerText()
 
     let summaryPrice = html.Descendants("div") 
                         |> Seq.find(fun div -> div.HasAttribute("class", "summaryPrice"))
                         |> fun div -> div.Descendants("span")                       
-
-    let price = summaryPrice |> Seq.head |> fun span -> span.InnerText() 
+    
+    let price = 
+        try
+            summaryPrice |> Seq.head |> fun span -> span.InnerText() 
                              |> fun str -> str.Replace(" ", "").Replace(" zł","")
                              |> fun str -> str.Replace("&nbsp;","")
                              |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<PLN>
+        with 
+            | :? System.FormatException -> raise(IncorrectAdvert(md5))
 
     let pricePerMeter = summaryPrice |> Seq.item(1) |> fun span -> span.InnerText() 
                              |> fun str -> (str.Split[|' '|]) |> Seq.head
@@ -133,32 +166,35 @@ let morizonAdvertParser(html:HtmlDocument, link:String) =
                     |> Seq.map(fun pair -> (fst(pair), snd(pair).Value))
 
 
-    let area = seekMorizonList(listItems, "Powierzchnia użytkowa")
+    let area = seekMorizonList(listItems, "Powierzchnia")
                     |> fun text -> (text.Split[|' '|]).[0]
                     |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<m^2>
 
-    let roomsNr = seekMorizonList(listItems, "Liczba pokoi") |> System.Int32.Parse
-    let tier = seekMorizonList(listItems, "Piętro")
-    let yearOfConstruction = seekMorizonList(listItems, "Rok budowy") |> System.Int32.Parse
-    let buildingType = seekMorizonList(listItems, "Typ budynku")
-    let newConstruction = if yearOfConstruction >= DateTime.Now.Year then Some true else Some false 
-    let heating = seekMorizonList(listItems, "Ogrzewanie")
+    let roomsNr = trySeekMorizonListForInt(listItems, "Liczba pokoi")
+    let tier = trySeekMorizonList(listItems, "Piętro")
     
-    let elevator = seekMorizonList(listItems, "Winda") |> polishStringToBoolaen
-    let basement = seekMorizonList(listItems, "Piwnica") |> polishStringToBoolaen
-    let balcony = seekMorizonList(listItems, "Balkon") |> polishStringToBoolaen
+    let buildingType = trySeekMorizonList(listItems, "Typ budynku")    
+    let heating = trySeekMorizonList(listItems, "Ogrzewanie")
+    let basement = trySeekMorizonListForBoolean(listItems, "Piwnica")
+    let balcony = trySeekMorizonListForBoolean(listItems, "Balkon")
+    let elevator = trySeekMorizonListForBoolean(listItems, "Winda")
+    let furnished = trySeekMorizonListForBoolean(listItems, "Meble")
 
+    let year = trySeekMorizonListForInt(listItems, "Rok budowy")
+
+    let newConstruction = if year.IsSome && year.Value >= DateTime.Now.Year then Some true else Some false
+     
     {
         Title = title; Description = description; 
         Md5 = md5; Url = link;
         TotalPrice = price; PricePerMeter = pricePerMeter; 
         Area = area; NumberOfRooms = roomsNr;
-        Furnished = None; NewConstruction = newConstruction;
-        BuildingType = Some buildingType; Tier = Some tier;
-        YearOfConstruction = Some yearOfConstruction;
+        Furnished = furnished; NewConstruction = newConstruction;
+        BuildingType = buildingType; Tier = tier;
+        YearOfConstruction = year;
         Elevator = elevator; Basement = basement;
-        Balcony = balcony; Heating = Some heating;
-        Parking = None
+        Balcony = balcony; Heating = heating;
+        Parking = None; District = None; Street = None;
     }
 
     
@@ -169,7 +205,7 @@ let gumtreeAdvertParser(html:HtmlDocument, link:String) =
                  |> Seq.head |> fun node -> node.InnerText()
 
     let description = html.Descendants("div") |> Seq.find(fun div -> div.HasAttribute("class", "description"))
-                      |> fun div -> div.Descendants("span") |> Seq.head |> fun span -> span.InnerText()
+                       |> fun div -> div.Descendants("span") |> Seq.head |> fun span -> span.InnerText()
 
     let price = html.Descendants("span") |> Seq.find(fun div -> div.HasAttribute("class", "amount"))
                 |> fun span -> span.InnerText().Replace(" zł","")
@@ -179,14 +215,26 @@ let gumtreeAdvertParser(html:HtmlDocument, link:String) =
                     |> Seq.filter(fun span -> Seq.length(span) = 2)
                     |> Seq.map(fun span -> (Seq.head(span).InnerText(), (span |> Seq.item(1)).InnerText()))
 
-    let area = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Wielkość")) |> fun pair -> snd(pair)
+    let area = 
+        try
+            listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Wielkość")) |> fun pair -> snd(pair)
                          |> System.Decimal.Parse |> LanguagePrimitives.DecimalWithMeasure<m^2>
+        with
+            | :? System.Collections.Generic.KeyNotFoundException -> raise(IncorrectAdvert(md5))
 
-    let roomsNr = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Liczba pokoi")) |> fun pair -> snd(pair)
+    let roomsNr = 
+        try
+            listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Liczba pokoi")) |> fun pair -> snd(pair)
                             |> fun str -> (str.Split[|' '|]).[0]
-                            |> System.Int32.Parse 
+                            |> System.Int32.Parse |> fun int -> Some(int)
+        with
+            | :? System.FormatException -> None
 
-    let parking = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Parking")) |> fun pair -> snd(pair)
+    let parking = 
+        try
+            listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Parking")) |> fun pair -> Some(snd(pair))
+        with 
+            | :? System.Collections.Generic.KeyNotFoundException -> None
                          
     {
         Title = title; Description = description; 
@@ -197,11 +245,12 @@ let gumtreeAdvertParser(html:HtmlDocument, link:String) =
         BuildingType = None; Tier = None;
         YearOfConstruction = None; Elevator = None;
         Basement = None; Balcony = None;
-        Heating = None; Parking = Some parking;
+        Heating = None; Parking = parking;
+        District = None; Street = None;
     }
 
 exception NoOgUrlException of string
-    
+
 let classifyAdvert(asyncStream:Async<Stream>) = 
     async{
         let! stream = asyncStream
@@ -210,9 +259,13 @@ let classifyAdvert(asyncStream:Async<Stream>) =
                     |> Seq.find(fun meta -> meta.HasAttribute("property", "og:url"))
                     |> fun node -> node.Attribute("content").Value()
 
-        return match ogUrl with
-                | StartsWith "http://olx.pl" -> olxAdvertParser(html, ogUrl)
-                | StartsWith "http://www.morizon.pl" -> morizonAdvertParser(html, ogUrl)
-                | StartsWith "http://www.gumtree.pl" -> gumtreeAdvertParser(html, ogUrl)
-                | _ -> raise(NoOgUrlException(ogUrl))
-    }      
+        try
+            let value = match ogUrl with
+                        | StartsWith "http://olx.pl" -> Some(olxAdvertParser(html, ogUrl))
+                        | StartsWith "http://www.morizon.pl" -> Some(morizonAdvertParser(html, ogUrl))
+                        | StartsWith "http://www.gumtree.pl" -> Some(gumtreeAdvertParser(html, ogUrl))
+                        | _ -> raise(NoOgUrlException(ogUrl))
+            return value
+        with
+            |  :? IncorrectAdvert -> return None
+    }

@@ -5,7 +5,7 @@
 let main argv = 
     printfn "%A" argv
     //let stopWatch = System.Diagnostics.Stopwatch.StartNew()
-    Async.RunSynchronously(Byteville.CrawlerLogic.crawl(1))
+    Async.RunSynchronously(Byteville.CrawlerLogic.crawl(10))
     //stopWatch.Stop()
     //printfn "%f" stopWatch.Elapsed.TotalMilliseconds
     0 // return an integer exit code
