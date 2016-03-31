@@ -3,6 +3,7 @@ open Xunit
 open Byteville.CrawlerLogic
 open FSharp.Data.UnitSystems.SI.UnitSymbols
 open Byteville.TextMining
+open Byteville.Core.Models
 open Swensen.Unquote
 
 type ClassifierTests() = 

@@ -1,6 +1,9 @@
 ﻿namespace Byteville.Tests
 open Xunit
 open Byteville.CrawlerLogic
+open Byteville.Crawler.Parsers.Olx
+open Byteville.Crawler.Parsers.Morizon
+open Byteville.Crawler.Parsers.Gumtree
 
 type CrawlerTests() = 
 

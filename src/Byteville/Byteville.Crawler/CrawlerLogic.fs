@@ -3,38 +3,11 @@ open System
 open System.Net
 open System.IO
 open FSharp.Data
-open System.Text.RegularExpressions
 open System.IO.Compression
-
-let olxAdverts = 
-    seq { 
-        let urlBase = "http://olx.pl/nieruchomosci/mieszkania/sprzedaz/krakow/q-mieszkania/"
-        yield urlBase
-
-        for page in 2 .. 20 do
-            yield urlBase + "?page=" + page.ToString()
-    }
-
-let morizonAdverts = 
-    seq { 
-        let urlBase = "http://www.morizon.pl/mieszkania/krakow/"
-        yield urlBase
-
-        for page in 2 .. 200 do
-            yield urlBase + "?page=" + page.ToString()
-    }
-
-let gumtreeAdverts = 
-    seq {
-        let urlBase = "http://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/krakow/mieszkanie/"
-        let checksum = "v1c9073l3200208a1dwp"
-        yield urlBase + checksum + "1"
-
-        let createUrl = fun i -> String.Format("{0}page-{1}/{2}{1}", urlBase, i, checksum)
-
-        for page in 2 .. 200 do
-            yield createUrl(page)
-    }
+open Byteville.Crawler.Parsers.Olx
+open Byteville.Crawler.Parsers.Morizon
+open Byteville.Crawler.Parsers.Gumtree
+open Byteville.Crawler.Helpers
 
 let useTor = false
 
@@ -58,58 +31,6 @@ let downloadHtmlAsync(url:string) =
                     
             return stream
           }
-
-let parseOlx(streamAsync:Async<Stream>) = 
-    async{
-        let! stream = streamAsync
-        let html = HtmlDocument.Load(stream)
-        return html.Descendants["table"]
-            |> Seq.filter(fun t -> t.HasAttribute("id", "offers_table"))
-            |> Seq.head
-            |> fun table -> table.Descendants["a"]
-            |> Seq.map(fun a -> a.AttributeValue("href"))
-            |> Seq.map(fun link -> (link.Split[|'#'|]).[0])
-            |> Seq.filter(fun link -> link.StartsWith("http://olx.pl/oferta/"))
-            |> Seq.distinct
-    }
-
-
-let parseMorizon(streamAsync:Async<Stream>) = 
-    async{
-        let! stream = streamAsync
-        let html = HtmlDocument.Load(stream)    
-        return html.Descendants["div"]
-            |> Seq.filter(fun t-> t.HasAttribute("class", "listingBox mainBox propertyListingBox"))
-            |> Seq.head
-            |> fun table -> table.Descendants["a"]
-            |> Seq.map(fun a -> a.AttributeValue("href"))
-            |> Seq.filter(fun link -> link.StartsWith("http://www.morizon.pl/oferta/"))
-            |> Seq.distinct
-    }
-
-let streamToString(stream:Stream) = 
-    use reader  = new StreamReader(stream)
-    reader.ReadToEnd()
-
-let parseGumtree(streamAsync:Async<Stream>) =
-    async{
-        let! stream = streamAsync    
-        let html = stream |> streamToString
-        let pattern = "href=\"\/(.*)\">"
-        let correctLinkPart = "a-mieszkania-i-domy-sprzedam-i-kupie"
-        return Regex.Matches(html, pattern) 
-            |> Seq.cast<Match> 
-            |> Seq.map(fun regMatch -> regMatch.Groups.[1].Value)
-            |> Seq.filter(fun link -> link.Contains(correctLinkPart))
-            |> Seq.map(fun link -> "http://www.gumtree.pl/" + link)
-    }
-
-let md5 (text : string) : string =
-    let data = System.Text.Encoding.UTF8.GetBytes(text)
-    use md5 = System.Security.Cryptography.MD5.Create()
-    (System.Text.StringBuilder(), md5.ComputeHash(data))
-    ||> Array.fold (fun sb b -> sb.Append(b.ToString("x2")))
-    |> string
 
 let basePath = @"C:/mydir/Projekty/ByteVIlle/src/DataStorage/adverts"
     

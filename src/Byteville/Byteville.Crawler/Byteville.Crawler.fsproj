@@ -54,7 +54,11 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <Compile Include="Helpers.fs" />
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="OlxParsers.fs" />
+    <Compile Include="MorizonParsers.fs" />
+    <Compile Include="GumtreeParsers.fs" />
     <Compile Include="CrawlerLogic.fs" />
     <Compile Include="TextMining.fs" />
     <Compile Include="Program.fs" />

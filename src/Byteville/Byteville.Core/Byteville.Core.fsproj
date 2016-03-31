@@ -135,6 +135,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Compile Include="Models\Car.fs" />
+    <Compile Include="Models\Advert.fs" />
     <Compile Include="DataLoader.fs" />
     <Compile Include="Controllers\ItemsController.fs" />
     <Compile Include="Controllers\SearchController.fs" />
