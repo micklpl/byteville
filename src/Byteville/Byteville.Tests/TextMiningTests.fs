@@ -59,16 +59,21 @@ type ClassifierTests() =
                         |> Seq.map(fun file -> Byteville.TextMining.loadFileFromDisk(file.FullName))
                         |> Seq.map(fun stream -> Byteville.TextMining.classifyAdvert(stream))
                         |> Async.Parallel |> Async.RunSynchronously
+                        |> Seq.filter(fun ad -> ad.IsSome)
+                        |> Seq.map(fun ad -> ad.Value)
                         |> Seq.toArray
+
+
+        let detected = adverts |> Seq.filter(fun ad -> ad.Street.IsSome) |> Seq.length
 
         Assert.NotEmpty(adverts)
 
     [<Fact>]
-    member x.StreetsParser_Helper() = 
+    member x.Streets_Parser_From_Title_Helper() = 
         let file = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/titles.txt"
         let tryParseAsync(title) =
             async{
-                return(Byteville.TextMining.tryParseStreet(title), title)
+                return(Byteville.TextMining.tryParseStreetFromTitle(title), title)
             }
 
         let titles = System.IO.File.ReadAllLines(file)
@@ -102,7 +107,7 @@ type ClassifierTests() =
     [<InlineData("Mieszkanie 98m2/5700zł/m al. Słowackiego!", "ALEJA JULIUSZA SŁOWACKIEGO")>]
     member x.StreetsParser_Test(title:string, expStreetName:string) =
         
-        let output =  Byteville.TextMining.tryParseStreet(title)
+        let output =  Byteville.TextMining.tryParseStreetFromTitle(title)
 
         test <@ output.Value.Name = expStreetName @>
 
@@ -114,7 +119,7 @@ type ClassifierTests() =
     [<InlineData("Mieszkanie, kawalerka Kraków Bronowice sprzedam właściciel")>]
     member x.StreetsParser_Should_Not_Match(title:string) =
         
-        let output = Byteville.TextMining.tryParseStreet(title)
+        let output = Byteville.TextMining.tryParseStreetFromTitle(title)
 
         test <@ output.IsNone @>
         

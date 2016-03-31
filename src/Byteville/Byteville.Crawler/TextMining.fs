@@ -20,25 +20,6 @@ let loadFileFromDisk path =
 
 exception NoOgUrlException of string
 
-let classifyAdvert(asyncStream:Async<Stream>) = 
-    async{
-        let! stream = asyncStream
-        let html = HtmlDocument.Load(stream)
-        let ogUrl = html.Descendants("meta")
-                    |> Seq.find(fun meta -> meta.HasAttribute("property", "og:url"))
-                    |> fun node -> node.Attribute("content").Value()
-
-        try
-            let value = match ogUrl with
-                        | StartsWith "http://olx.pl" -> Some(olxAdvertParser(html, ogUrl))
-                        | StartsWith "http://www.morizon.pl" -> Some(morizonAdvertParser(html, ogUrl))
-                        | StartsWith "http://www.gumtree.pl" -> Some(gumtreeAdvertParser(html, ogUrl))
-                        | _ -> raise(NoOgUrlException(ogUrl))
-            return value
-        with
-            |  :? IncorrectAdvert -> return None
-    }
-
 let searchController = new Byteville.Core.Controllers.SearchController()
 
 let neighboursPattern = "^(ul|ulica|al|aleja|os|osiedle)$"
@@ -50,8 +31,12 @@ let tryGetItem(tokens:string[], index:int) =
     if index >= tokens.Length then 
         None 
     else 
-        let item = Array.item(index) <| tokens
-        if item.Length > 2 then Some(item) else None 
+        let mutable item = Some(tokens |> Array.item(index))
+        if (index + 1) < tokens.Length then
+            let nextToken = tokens |> Array.item(index + 1)
+            if Regex.IsMatch(nextToken, "[0-9]{1,3}.*") then
+                item <- None
+        if item.IsSome && item.Value.Length > 2 then item else None 
 
 let tryParseStreetByNeighbours tokens =     
     match findNeighbourhoodWords(tokens) with
@@ -76,12 +61,15 @@ let blindSearch tokens =
            |> Seq.map(fun res -> res |>Seq.head)
            |> Seq.tryHead
 
-let removeTokens(str:string) =
+let removeCharacters(str:string) =
     str.Replace("."," ").Replace(",","").Replace("-", " ").Replace("!","").Replace("/"," ")
 
-let tryParseStreet(title:String) = 
-    let tokens = removeTokens(title).ToLower().Split[|' '|]
-                    |> Seq.filter(fun token -> not(String.IsNullOrWhiteSpace(token)))
+let tokenize(str: String) = 
+    removeCharacters(str).ToLower().Split[|' '|]
+        |> Seq.filter(fun token -> not(String.IsNullOrWhiteSpace(token)))
+
+let tryParseStreetFromTitle(title:String) = 
+    let tokens = tokenize(title)
                     |> Seq.filter(fun token -> not(token = "kraków")) |> Seq.toArray
 
     match tryParseStreetByNeighbours(tokens) with
@@ -89,3 +77,42 @@ let tryParseStreet(title:String) =
         | Some(street) -> match searchController.PrefixSearch(street) with
                                 | [|x|] -> Some(x)
                                 | _ -> blindSearch(tokens)
+
+let tryParseStreetFromDescription(description:String) =
+    let tokens = tokenize(description) |> Seq.toArray
+    match tryParseStreetByNeighbours(tokens) with
+        | None -> None
+        | Some(street) -> match searchController.PrefixSearch(street) with
+                                | [|x|] -> Some(x)
+                                | _ -> None
+
+
+let classifyAdvert(asyncStream:Async<Stream>) = 
+    async{
+        let! stream = asyncStream
+        let html = HtmlDocument.Load(stream)
+        let ogUrl = html.Descendants("meta")
+                    |> Seq.find(fun meta -> meta.HasAttribute("property", "og:url"))
+                    |> fun node -> node.Attribute("content").Value()
+
+        let advert = 
+            try
+                match ogUrl with
+                    | StartsWith "http://olx.pl" -> Some(olxAdvertParser(html, ogUrl))
+                    | StartsWith "http://www.morizon.pl" -> Some(morizonAdvertParser(html, ogUrl))
+                    | StartsWith "http://www.gumtree.pl" -> Some(gumtreeAdvertParser(html, ogUrl))
+                    | _ -> raise(NoOgUrlException(ogUrl))
+            with
+                |  :? IncorrectAdvert -> None
+        
+        if advert.IsSome && advert.Value.Street.IsNone then
+            let street = match tryParseStreetFromTitle(advert.Value.Title) with
+                            | Some(x) -> Some(x)
+                            | _ -> tryParseStreetFromDescription(advert.Value.Description)          
+
+            if street.IsSome then
+                advert.Value.Street <- Some(street.Value.Name)
+                advert.Value.District <-  Some(street.Value.District)
+
+        return advert
+    }
