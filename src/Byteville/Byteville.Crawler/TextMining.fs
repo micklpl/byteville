@@ -276,7 +276,7 @@ let classifyAdvert(asyncStream:Async<Stream>) =
 
 let searchController = new Byteville.Core.Controllers.SearchController()
 
-let neighboursPattern = "(ul|ulica|al|aleja|os|osiedle)"
+let neighboursPattern = "^(ul|ulica|al|aleja|os|osiedle)$"
 
 let findNeighbourhoodWords(tokens:string[]) = 
     Array.FindIndex(tokens, fun token -> Regex.IsMatch(token, neighboursPattern))
@@ -294,13 +294,15 @@ let tryParseStreetByNeighbours tokens =
         | index -> tryGetItem(tokens, index + 1)
 
 // http://www.wordcounter.com/
-let popularWords = ["osiedle"; "ulica"; "kraków"; "aleja"; "mieszkanie"; "pokoje"; "sprzedam"; "centrum"; 
+let popularWords = ["osiedle"; "ulica"; "aleja"; "mieszkanie"; "pokoje"; "sprzedam"; "centrum"; 
                     "huta"; "bronowice"; "dębniki"; "pokojowe"; "podgórze"; "prądnik"; "miasto"; "krowodrza";
-                    "ruczaj"; "mistrzejowice"; "czerwony"; "biały"; "prokocim"; "bieżanów"] 
+                    "ruczaj"; "mistrzejowice"; "czerwony"; "biały"; "prokocim"; "bieżanów"; "krakowa"; "jasna";
+                    "płaszów"; "słoneczne"; "wzgórza"; "zwierzyniec"; "fałęcki"; "klucz"; "taras"] 
 
 let removeUnnecessaryWords(tokens: String[]) = 
     tokens |> Seq.filter(fun token -> token.Length > 2)
            |> Seq.filter(fun token -> not(popularWords |> List.contains(token)))
+           |> Seq.rev // statystycznie częściej nazwa ulicy występuje na końcu tytułu
 
 let blindSearch tokens = 
     tokens |> removeUnnecessaryWords
@@ -309,8 +311,14 @@ let blindSearch tokens =
            |> Seq.map(fun res -> res |>Seq.head)
            |> Seq.tryHead
 
+let removeTokens(str:string) =
+    str.Replace("."," ").Replace(",","").Replace("-", " ").Replace("!","").Replace("/"," ")
+
 let tryParseStreet(title:String) = 
-    let tokens = title.Replace(".","").Replace(",","").Replace("-", " ").ToLower().Split[|' '|]
+    let tokens = removeTokens(title).ToLower().Split[|' '|]
+                    |> Seq.filter(fun token -> not(String.IsNullOrWhiteSpace(token)))
+                    |> Seq.filter(fun token -> not(token = "kraków")) |> Seq.toArray
+
     match tryParseStreetByNeighbours(tokens) with
         | None -> blindSearch(tokens)
         | Some(street) -> match searchController.PrefixSearch(street) with

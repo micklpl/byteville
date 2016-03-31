@@ -11,6 +11,8 @@ open Nest
 type SearchController() =
     inherit ApiController()
 
+    let mutable reqCount = 0
+
     let BuildPrefixQuery(phrase: String) = 
         let prefixQuery = new PrefixQuery()
         prefixQuery.Value <- phrase
@@ -41,7 +43,11 @@ type SearchController() =
     member self.PrefixSearch(q:String) = 
         let client = GetElasticClient()
         let prefixQuery = BuildQuery("name", q, false)
+        reqCount <- reqCount + 1
         client.Search<AdministrationUnit>(prefixQuery).Documents.ToArray()
+
+    member x.Count() =
+        reqCount
 
     member self.Get([<FromUri>]q :String) =
         let client = GetElasticClient()

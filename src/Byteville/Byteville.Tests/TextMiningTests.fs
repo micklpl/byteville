@@ -65,8 +65,14 @@ type ClassifierTests() =
     [<Fact>]
     member x.StreetsParser_Helper() = 
         let file = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/titles.txt"
+        let tryParseAsync(title) =
+            async{
+                return(Byteville.TextMining.tryParseStreet(title), title)
+            }
+
         let titles = System.IO.File.ReadAllLines(file)
-                        |> Seq.map(fun title -> (Byteville.TextMining.tryParseStreet(title)), title)
+                        |> Seq.map(fun title -> tryParseAsync(title))
+                        |> Async.Parallel |> Async.RunSynchronously
           
         let found = titles 
                         |> Seq.filter(fun ad -> fst(ad).IsSome)
@@ -77,6 +83,8 @@ type ClassifierTests() =
         let nones = titles |> Seq.filter(fun ad -> fst(ad).IsNone)
                             |> Seq.map(fun pair -> snd(pair))
                             |> String.concat "\n"  
+
+        let total = Byteville.TextMining.searchController.Count()
        
         Assert.NotEmpty(found)
 
@@ -85,12 +93,29 @@ type ClassifierTests() =
     [<InlineData("2 pokoje, 49 m2, os. Sportowe, Nowa Huta", "OSIEDLE SPORTOWE")>]  
     [<InlineData("Kraków, Nowa Huta, Osiedle Urocze, os.Urocze", "OSIEDLE UROCZE")>]
     [<InlineData("Mieszkanie bezpośrednio Kraków Ruczaj Ulica Pszczelna + gratis", "ULICA PSZCZELNA")>]
-    [<InlineData("Mieszkanie jednopokojowe - Bochenka", "ULICA ADAMA BOCHENKA")>]    
+    [<InlineData("Mieszkanie jednopokojowe - Bochenka", "ULICA ADAMA BOCHENKA")>]
+    [<InlineData("Kraków, Podgórze Duchackie, Wola Duchacka, Sanocka", "ULICA SANOCKA")>]
+    [<InlineData("Mieszkanie 53m + taras 17m ul.Radzikowskiego kraków", "ULICA WALEREGO ELIASZA RADZIKOWSKIEGO")>]
+    [<InlineData("Kraków, Krowodrza, kmieca, Krowodrza, Łobzów", "ULICA KMIECA")>]
+    [<InlineData("Piękne mieszkanie 2pok 37m2 ul. Pużaka/Azory", "ULICA KAZIMIERZA PUŻAKA")>]
+    [<InlineData("Mieszkanie 98m2/5700zł/m al. Słowackiego!", "ALEJA JULIUSZA SŁOWACKIEGO")>]
     member x.StreetsParser_Test(title:string, expStreetName:string) =
         
         let output =  Byteville.TextMining.tryParseStreet(title)
 
         test <@ output.Value.Name = expStreetName @>
+
+    [<Theory>]
+    [<InlineData("Mieszkanie 2 pokoje z jasna kuchnia Gratis wyposażenie")>]
+    [<InlineData("Sprzedam mieszkanie w centrum Krakowa")>]
+    [<InlineData("Mieszkanie Kraków Wzgórza Krzesławickie 79m2 (nr: 28483)")>]
+    [<InlineData("Wszystkie nr bez, Mieszkanie Śródmieście Grzegórzki - Bez Prowizji")>]
+    [<InlineData("Mieszkanie, kawalerka Kraków Bronowice sprzedam właściciel")>]
+    member x.StreetsParser_Should_Not_Match(title:string) =
+        
+        let output = Byteville.TextMining.tryParseStreet(title)
+
+        test <@ output.IsNone @>
         
 
 
