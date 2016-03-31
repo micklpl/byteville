@@ -65,6 +65,7 @@ type ClassifierTests() =
 
 
         let detected = adverts |> Seq.filter(fun ad -> ad.Street.IsSome) |> Seq.length
+        let districtsOnly = adverts |> Seq.filter(fun ad -> ad.Street.IsNone && ad.District.IsSome) |> Seq.length 
 
         Assert.NotEmpty(adverts)
 

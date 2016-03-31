@@ -52,10 +52,10 @@ let popularWords = ["osiedle"; "ulica"; "aleja"; "mieszkanie"; "pokoje"; "sprzed
 let removeUnnecessaryWords(tokens: String[]) = 
     tokens |> Seq.filter(fun token -> token.Length > 2)
            |> Seq.filter(fun token -> not(popularWords |> List.contains(token)))
-           |> Seq.rev // statystycznie częściej nazwa ulicy występuje na końcu tytułu
+            
 
 let blindSearch tokens = 
-    tokens |> removeUnnecessaryWords
+    tokens |> removeUnnecessaryWords |> Seq.rev // statystycznie częściej nazwa ulicy występuje na końcu tytułu
            |> Seq.map(fun token -> searchController.PrefixSearch(token))
            |> Seq.filter(fun res -> res.Length = 1)
            |> Seq.map(fun res -> res |>Seq.head)
@@ -86,6 +86,15 @@ let tryParseStreetFromDescription(description:String) =
                                 | [|x|] -> Some(x)
                                 | _ -> None
 
+let districts = ["Dębniki"; "Zwierzyniec"; "Swoszowice"; "Podgórze"; 
+                "Prądnik Biały"; "Stare Miasto"; "Nowa Huta"; "Prokocim-Bieżanów";
+                 "Wola Duchacka"; "Wzgórza Krzesławickie"; "Prądnik Czerwony"; 
+                 "Łagiewniki"; "Bronowice"; "Grzegórzki"; "Krowodrza"; "Czyżyny"; 
+                 "Mistrzejowice"; "Bieńczyce"] |> List.map(fun district -> district.ToLower())
+
+let tryParseDistrictFromTitle(title:String) =
+    let title = title.ToLower()
+    districts |> List.filter(fun district -> title.Contains(district)) |> List.tryHead
 
 let classifyAdvert(asyncStream:Async<Stream>) = 
     async{
@@ -113,6 +122,8 @@ let classifyAdvert(asyncStream:Async<Stream>) =
             if street.IsSome then
                 advert.Value.Street <- Some(street.Value.Name)
                 advert.Value.District <-  Some(street.Value.District)
+            else
+                advert.Value.District <- tryParseDistrictFromTitle(advert.Value.Title)
 
         return advert
     }
