@@ -92,6 +92,7 @@ let morizonAdvertParser(html:HtmlDocument, link:String) =
                     |> Seq.filter(fun pair -> (snd(pair).IsSome))
                     |> Seq.map(fun pair -> (fst(pair), snd(pair).Value))
 
+    let creationDate = System.DateTime.Parse(trySeekMorizonList(listItems, "Opublikowano").Value)
 
     let area = seekMorizonList(listItems, "Powierzchnia")
                     |> fun text -> (text.Split[|' '|]).[0]
@@ -113,7 +114,7 @@ let morizonAdvertParser(html:HtmlDocument, link:String) =
      
     {
         Title = title; Description = description; 
-        Md5 = md5; Url = link;
+        Md5 = md5; Url = link; CreationDate = creationDate;
         TotalPrice = price; PricePerMeter = pricePerMeter; 
         Area = area; NumberOfRooms = roomsNr;
         Furnished = furnished; NewConstruction = newConstruction;

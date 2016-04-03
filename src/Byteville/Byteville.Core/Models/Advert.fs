@@ -9,6 +9,7 @@ type Advert = {
     Description: String;
     Md5 : String;
     Url: String;
+    CreationDate: DateTime;
     TotalPrice : decimal<PLN>;
     PricePerMeter : decimal<PLN/m^2>;
     Area : decimal<m^2>;
@@ -22,7 +23,7 @@ type Advert = {
     Basement: Option<bool>;
     Balcony: Option<bool>;
     Heating: Option<string>;
-    Parking: Option<string>;
+    Parking: Option<string>;   
 
     mutable Street: Option<string>;
     mutable District: Option<string>;

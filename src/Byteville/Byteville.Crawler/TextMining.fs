@@ -22,7 +22,7 @@ exception NoOgUrlException of string
 
 let searchController = new Byteville.Core.Controllers.SearchController()
 
-let neighboursPattern = "^(ul|ulica|al|aleja|os|osiedle)$"
+let neighboursPattern = "^(ul|ulica|ulicy|al|aleja|os|osiedle)$"
 
 let findNeighbourhoodWords(tokens:string[]) = 
     Array.FindIndex(tokens, fun token -> Regex.IsMatch(token, neighboursPattern))
@@ -68,6 +68,13 @@ let tokenize(str: String) =
     removeCharacters(str).ToLower().Split[|' '|]
         |> Seq.filter(fun token -> not(String.IsNullOrWhiteSpace(token)))
 
+let nextToken(tokens:String[], detectedToken:String) = 
+    let index = tokens |> Array.tryFindIndex(fun token -> token = detectedToken)               
+    let nextTokenIndex = if index.IsNone then Int32.MaxValue else (index.Value + 1)
+    match tokens|> Array.tryItem(nextTokenIndex) with
+        | None -> "_"
+        | Some(x) -> x
+
 let tryParseStreetFromTitle(title:String) = 
     let tokens = tokenize(title)
                     |> Seq.filter(fun token -> not(token = "kraków")) |> Seq.toArray
@@ -77,24 +84,54 @@ let tryParseStreetFromTitle(title:String) =
         | Some(street) -> match searchController.PrefixSearch(street) with
                                 | [|x|] -> Some(x)
                                 | _ -> blindSearch(tokens)
+                                                    
+let tryRemoveSuffix(text:String) = 
+    let shortenedLength = text.Length - 3 
+    if shortenedLength > 0 then text.Substring(0, shortenedLength) else text                             
+
+let tryAdvancedNeighbourhoodPatterns(tokens:string[]) = 
+    let index = tokens |> Seq.tryFindIndex(fun token -> token = "przy")
+    match index with
+       | None -> None
+       | Some(i) -> match tokens |> Seq.item(i+1) with
+                    | "ul" | "ul." | "ulicy" -> Some(tokens |> Seq.item(i+2) |> fun s -> tryRemoveSuffix(s)) //odmiana niektórych ulic, np. Litewskiej
+                    | _ -> None
+
+let tryMatchTokenInIndex(x:string, tokens:string[]) =
+    match searchController.PrefixSearch(x) with
+            | [|x|] -> Some(x)
+            | [||] -> None 
+            | arr ->  match(arr |> Array.tryFind(fun str -> 
+                                str.Name.Contains(nextToken(tokens, x)))) with
+                                | None -> None
+                                | x -> x
 
 let tryParseStreetFromDescription(description:String) =
-    let tokens = tokenize(description) |> Seq.toArray
+    let tokens = tokenize(description |> removeCharacters) |> Seq.toArray
+
+                                
+
     match tryParseStreetByNeighbours(tokens) with
         | None -> None
-        | Some(street) -> match searchController.PrefixSearch(street) with
-                                | [|x|] -> Some(x)
-                                | _ -> None
+        | Some(x) -> match tryMatchTokenInIndex(x, tokens) with
+                            | Some(x) -> Some(x)
+                            | _ -> match tryAdvancedNeighbourhoodPatterns(tokens) with
+                                            | Some(x) -> tryMatchTokenInIndex(x, tokens)
+                                            | _ -> None  
+    
 
 let districts = ["Dębniki"; "Zwierzyniec"; "Swoszowice"; "Podgórze"; 
                 "Prądnik Biały"; "Stare Miasto"; "Nowa Huta"; "Prokocim-Bieżanów";
                  "Wola Duchacka"; "Wzgórza Krzesławickie"; "Prądnik Czerwony"; 
                  "Łagiewniki"; "Bronowice"; "Grzegórzki"; "Krowodrza"; "Czyżyny"; 
-                 "Mistrzejowice"; "Bieńczyce"] |> List.map(fun district -> district.ToLower())
+                 "Mistrzejowice"; "Bieńczyce"]
 
-let tryParseDistrictFromTitle(title:String) =
-    let title = title.ToLower()
-    districts |> List.filter(fun district -> title.Contains(district)) |> List.tryHead
+let tryParseDistrict(text:String) =
+    let district = districts |> List.filter(fun district -> text.Contains(district)) |> List.tryHead
+    match district with
+        | Some(x) -> Some(x)
+        | _ -> if text.Contains("Prokocim") || text.Contains("Bieżanów") 
+                then Some("Prokocim-Bieżanów") else None
 
 let classifyAdvert(asyncStream:Async<Stream>) = 
     async{
@@ -115,15 +152,17 @@ let classifyAdvert(asyncStream:Async<Stream>) =
                 |  :? IncorrectAdvert -> None
         
         if advert.IsSome && advert.Value.Street.IsNone then
-            let street = match tryParseStreetFromTitle(advert.Value.Title) with
-                            | Some(x) -> Some(x)
-                            | _ -> tryParseStreetFromDescription(advert.Value.Description)          
+            let street = match tryParseStreetFromTitle(advert.Value.Title) with                            
+                            | None -> tryParseStreetFromDescription(advert.Value.Description)
+                            | x -> x          
 
             if street.IsSome then
                 advert.Value.Street <- Some(street.Value.Name)
                 advert.Value.District <-  Some(street.Value.District)
             else
-                advert.Value.District <- tryParseDistrictFromTitle(advert.Value.Title)
+                advert.Value.District <- match tryParseDistrict(advert.Value.Title) with
+                                                | None -> tryParseDistrict(advert.Value.Description)
+                                                | x -> x
 
         return advert
     }

@@ -53,6 +53,9 @@ let gumtreeAdvertParser(html:HtmlDocument, link:String) =
                     |> Seq.filter(fun span -> Seq.length(span) = 2)
                     |> Seq.map(fun span -> (Seq.head(span).InnerText(), (span |> Seq.item(1)).InnerText()))
 
+    let creationDate = listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Data dodania")) 
+                        |> fun pair -> snd(pair) |> System.DateTime.Parse
+
     let area = 
         try
             listItems |> Seq.find(fun pair -> (fst(pair)).Contains("Wielkość")) |> fun pair -> snd(pair)
@@ -76,7 +79,7 @@ let gumtreeAdvertParser(html:HtmlDocument, link:String) =
                          
     {
         Title = title; Description = description; 
-        Md5 = md5; Url = link;
+        Md5 = md5; Url = link; CreationDate = creationDate; 
         TotalPrice = price; PricePerMeter = (price/area); 
         Area = area; NumberOfRooms = roomsNr;
         Furnished = None; NewConstruction = None;

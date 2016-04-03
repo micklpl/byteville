@@ -22,6 +22,7 @@ type ClassifierTests() =
         Assert.True(data.PricePerMeter = 5526.32M<PLN/m^2>)
         Assert.True(data.NumberOfRooms = Some 3)
         Assert.True(data.TotalPrice = 210000M<PLN>)
+        Assert.True(data.CreationDate = new System.DateTime(2016, 03, 06))
 
     [<Fact>]
     member x.MorizonAdvertsParserTest() =
@@ -37,6 +38,7 @@ type ClassifierTests() =
         Assert.True(data.PricePerMeter = 8133M<PLN/m^2>)
         Assert.True(data.NumberOfRooms = Some 1)
         Assert.True(data.TotalPrice = 243000M<PLN>)
+        Assert.True(data.CreationDate = new System.DateTime(2015, 10, 19))
 
     [<Fact>]
     member x.GumtreeAdvertsParserTest() =
@@ -51,6 +53,7 @@ type ClassifierTests() =
         Assert.True(data.Area = 36M<m^2>)
         Assert.True(data.NumberOfRooms = None)
         Assert.True(data.TotalPrice = 220000M<PLN>)
+        Assert.True(data.CreationDate = new System.DateTime(2016, 3, 30))
     
     [<Fact>]
     member x.Parsing_Without_Errors_Test() = 
@@ -65,7 +68,17 @@ type ClassifierTests() =
 
 
         let detected = adverts |> Seq.filter(fun ad -> ad.Street.IsSome) |> Seq.length
-        let districtsOnly = adverts |> Seq.filter(fun ad -> ad.Street.IsNone && ad.District.IsSome) |> Seq.length 
+        let districtsOnly = adverts |> Seq.filter(fun ad -> ad.Street.IsNone && ad.District.IsSome) |> Seq.length
+
+        let withoutDistrict = adverts |> Seq.filter(fun ad -> ad.District.IsNone) |> Seq.length
+
+        let districtFromBody = adverts |> Seq.filter(fun d -> d.Street.IsNone)
+                                       |> Seq.map(fun ad -> ad.Description)
+                                       |> Seq.toArray
+                                       |> String.concat "\n"   
+        
+        let sc = new Byteville.Core.Controllers.SearchController()
+        sc.Send(adverts)
 
         Assert.NotEmpty(adverts)
 
@@ -123,6 +136,14 @@ type ClassifierTests() =
         let output = Byteville.TextMining.tryParseStreetFromTitle(title)
 
         test <@ output.IsNone @>
+
+    [<Theory>]
+    [<InlineData("usytuowane jest w bloku przy ul.Litewskiej", "ULICA LITEWSKA")>]
+    member x.StreetsParser_From_Description(text:string, expectedStreet:string) =
+        
+        let output = Byteville.TextMining.tryParseStreetFromDescription(text)
+
+        test <@ output.Value.Name = expectedStreet @>
         
 
 

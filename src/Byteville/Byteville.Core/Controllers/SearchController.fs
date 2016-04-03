@@ -7,6 +7,7 @@ open System.Web.Http
 open Newtonsoft.Json
 open Byteville.Core
 open Nest
+open Byteville.Core.Models
 
 type SearchController() =
     inherit ApiController()
@@ -35,13 +36,13 @@ type SearchController() =
         req.Query <- new QueryContainer(queryBase)
         req
 
-    let GetElasticClient() = 
+    let GetElasticClient(index) = 
         let node = new Uri("http://localhost:9200")
         let settings = new ConnectionSettings(node)        
-        new ElasticClient(settings.DefaultIndex("streets"))
+        new ElasticClient(settings.DefaultIndex(index))
 
     member self.PrefixSearch(q:String) = 
-        let client = GetElasticClient()
+        let client = GetElasticClient("streets")
         let prefixQuery = BuildQuery("name", q, false)
         reqCount <- reqCount + 1
         client.Search<AdministrationUnit>(prefixQuery).Documents.ToArray()
@@ -49,8 +50,12 @@ type SearchController() =
     member x.Count() =
         reqCount
 
+    member x.Send(adverts:seq<Advert>) =
+        let client = GetElasticClient("adverts")
+        client.IndexMany(adverts |> Seq.toArray) |> ignore
+
     member self.Get([<FromUri>]q :String) =
-        let client = GetElasticClient()
+        let client = GetElasticClient("streets")
         let prefixQuery = BuildQuery("name", q, false)
         let search = fun (client: ElasticClient, query: SearchRequest) -> 
             client.Search<AdministrationUnit>(query).Documents.ToArray()

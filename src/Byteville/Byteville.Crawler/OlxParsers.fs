@@ -5,6 +5,7 @@ open Byteville.Core.Models
 open System
 open Byteville.Crawler.Helpers
 open FSharp.Data.UnitSystems.SI.UnitSymbols
+open System.Text.RegularExpressions
 
 let olxAdverts = 
     seq { 
@@ -36,9 +37,21 @@ let parseOlxTable(trs:seq<HtmlNode * HtmlNode>, th:String, tag:String) =
         |> Seq.filter(fun f -> not(String.IsNullOrWhiteSpace(f)))
         |> Seq.head |> fun str -> str.Replace(".", ",")
     
+let dateRegex = "creationDate=([0-9]{4}-[0-9]{2}-[0-9]{2})"
 
 let olxAdvertParser(html:HtmlDocument, link:String) =
     let md5 = md5(link)
+
+    let noscriptSrc = html.Descendants("noscript") |> Seq.map(fun d -> d.Descendants("img") |> Seq.tryHead)
+                        |> Seq.filter(fun img -> img.IsSome)
+                        |> Seq.map(fun img -> img.Value.AttributeValue("src"))
+                        |> Seq.filter(fun img -> Regex.IsMatch(img, dateRegex))
+                        |> Seq.head
+
+
+    let creationDateStr = (Regex.Matches(noscriptSrc, dateRegex).[0].Value.Split[|'='|]).[1]
+    let creationDate = DateTime.Parse(creationDateStr)
+
     let title = html.Descendants("h1") |> Seq.head |> fun node -> node.InnerText()
 
     let description = html.Descendants(fun f-> f.AttributeValue("id") = "textContent")
@@ -80,7 +93,7 @@ let olxAdvertParser(html:HtmlDocument, link:String) =
 
     {
         Title = title; Description = description; 
-        Md5 = md5; Url = link;
+        Md5 = md5; Url = link; CreationDate = creationDate;
         TotalPrice = price; PricePerMeter = pricePerMeter; 
         Area = area; NumberOfRooms = Some roomsNr;
         Furnished = Some furnished; NewConstruction = Some newConstruction;
