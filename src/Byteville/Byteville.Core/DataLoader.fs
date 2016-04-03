@@ -5,7 +5,10 @@ open System.Text.RegularExpressions
 open System.Web
 open Nest
 open System.Net
+open Newtonsoft.Json
 open System.Collections.Specialized
+open Byteville.Core.Models
+open Newtonsoft.Json.FSharp
 
 [<CLIMutable>]
 type AdministrationUnit = { Name : String;  AllocationCode: String; District: String }
@@ -71,3 +74,17 @@ type DataLoader() =
         let client = new ElasticClient(settings.DefaultIndex(name))
         
         client.Count<AdministrationUnit>().Count > 0L
+
+    member x.AdvertToJson(advert:Advert) = 
+        let json = JsonConvert.SerializeObject(advert, [| OptionConverter() :> JsonConverter |])
+                    .Replace("@","")
+        System.Text.Encoding.UTF8.GetBytes(json)
+
+    member x.SendAdverts(adverts:seq<Advert>) =
+        let client = new WebClient()
+        client.Headers.Add("Content-type: application/json")
+
+        adverts |> Seq.map(fun advert -> x.AdvertToJson(advert)) |>
+            Seq.iter(fun json -> client.UploadData("http://localhost:9200/adverts/advert/", 
+                                    "POST", json) |> ignore)
+

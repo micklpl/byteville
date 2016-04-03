@@ -50,10 +50,6 @@ type SearchController() =
     member x.Count() =
         reqCount
 
-    member x.Send(adverts:seq<Advert>) =
-        let client = GetElasticClient("adverts")
-        client.IndexMany(adverts |> Seq.toArray) |> ignore
-
     member self.Get([<FromUri>]q :String) =
         let client = GetElasticClient("streets")
         let prefixQuery = BuildQuery("name", q, false)
