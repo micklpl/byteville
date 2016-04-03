@@ -18,7 +18,7 @@ type DistrictsController() =
     let GetElasticClient() = 
         let node = new Uri("http://localhost:9200")
         let settings = new ConnectionSettings(node)        
-        new ElasticClient(settings.DefaultIndex("streets"))
+        new ElasticClient(settings.DefaultIndex("adverts"))
 
     member x.Get() =      
         let client = GetElasticClient()
@@ -26,9 +26,9 @@ type DistrictsController() =
         let searchRequest = new SearchRequest()
         let dictionary = new Dictionary<string, IAggregationContainer>()
 
-        let aggregator = new Nest.TermsAggregation("district")
+        let aggregator = new Nest.TermsAggregation("District")
         let field = new Field()
-        field.Name <- "district"
+        field.Name <- "District"
 
         aggregator.Field <- field
         aggregator.Size <- new System.Nullable<int>(40)
@@ -49,7 +49,7 @@ type DistrictsController() =
         let searchRequest = new SearchRequest()
         let termQuery = TermQuery()
         let field = new Field()
-        field.Name <- "district"
+        field.Name <- "District"
         termQuery.Field <- field
         termQuery.Value <- id
         searchRequest.Query <- new QueryContainer(termQuery)

@@ -76,6 +76,7 @@ type ClassifierTests() =
                                        |> String.concat "\n"   
                                                
         let loader = new Byteville.Core.DataLoader()
+        loader.CreateAdvertsIndex() |> ignore
         loader.SendAdverts(adverts)
 
         Assert.True(true)
