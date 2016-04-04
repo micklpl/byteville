@@ -137,9 +137,10 @@
     <Compile Include="Models\Car.fs" />
     <Compile Include="Models\Advert.fs" />
     <Compile Include="DataLoader.fs" />
+    <Compile Include="Controllers\AggregationsController.fs" />
+    <Compile Include="Controllers\DistrictsController.fs" />
     <Compile Include="Controllers\ItemsController.fs" />
     <Compile Include="Controllers\SearchController.fs" />
-    <Compile Include="Controllers\DistrictsController.fs" />
     <Content Include="Web.config" />
     <Compile Include="NLogger.fs" />
     <Content Include="Global.asax" />

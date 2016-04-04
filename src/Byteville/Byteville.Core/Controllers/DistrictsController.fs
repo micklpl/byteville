@@ -9,8 +9,9 @@ open Byteville.Core
 open Nest
 open Nest.Aggregations.Visitor
 open Elasticsearch.Net
+open Byteville.Core.Models
 
-type District = {name: string; streetsCount: int }
+type District2 = { name:string; streetsCount:int}
 
 type DistrictsController() =
     inherit ApiController()
@@ -40,7 +41,7 @@ type DistrictsController() =
         dictionary.Add("districts_by_popularity", container)
         searchRequest.Aggregations <- new AggregationDictionary(dictionary)
 
-        client.Search<AdministrationUnit>(searchRequest).Aggs.Terms("districts_by_popularity").Buckets.ToArray()
+        client.Search<AdvertBase>(searchRequest).Aggs.Terms("districts_by_popularity").Buckets.ToArray()
         |> Array.map(fun d -> { name = d.Key; streetsCount = int32(d.DocCount.Value); })
 
     member self.Get(id: string)  =  
