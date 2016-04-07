@@ -69,7 +69,6 @@ type AggregationsController() =
 
     member x.CreateRange(low:Option<int>, high:Option<int>) =
         let range = new Nest.Range()
-        range.Key <- "PricePerMeter"
         if low.IsSome then
             range.From <- new Nullable<float>(float(low.Value))
         if high.IsSome then

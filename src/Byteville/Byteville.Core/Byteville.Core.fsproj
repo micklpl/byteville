@@ -158,6 +158,7 @@
     <Content Include="Modules\districts.js" />
     <Content Include="Modules\map.html" />
     <Content Include="Modules\map.js" />
+    <Content Include="Modules\aggregation-results.html" />
     <None Include="NLog.xsd" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

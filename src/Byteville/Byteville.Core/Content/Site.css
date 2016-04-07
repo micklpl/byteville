@@ -1,6 +1,8 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    background-color: #C5B6B8;
+    color: #60000D;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -98,4 +100,39 @@
   -moz-animation:    pulsar 1.4s infinite; /* Fx 5+ */
   -o-animation:      pulsar 1.4s infinite; /* Opera 12+ */
   animation:         pulsar 1.4s infinite; /* IE 10+, Fx 29+ */
+}
+
+#mapContent {
+  margin-left:  30%;
+  margin-right: 10%;
+}
+#mapNavbar {
+  float: left;
+  width: 30%;
+  height: 100%; 
+  padding: 2%;
+}
+
+#mapNavbarPanel {
+  height: 150%;
+  background-color: #F3E6E8;
+  color: #A23645;
+  padding: 30px 20px;
+  width: 250px;
+  border: 2px solid #60000D;
+}
+
+#mapNavbarPanel li{
+    list-style: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#mapNavbar li:hover{
+    color: #60000D;
+}
+
+#mapNavbarPanel ul{
+    list-style: none;
+    padding-left: 0px;
 }

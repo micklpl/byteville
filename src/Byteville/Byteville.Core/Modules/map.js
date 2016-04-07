@@ -10,15 +10,17 @@ export class Map{
         this.details = undefined;
 
         var self = this;
-        client.get("api/districts").then( response => {
+        client.get("api/aggregations/District").then( response => {
             var response = JSON.parse(response.response);
             for(var i = 0; i < response.length; i++){
-                var name = response[i].name;
+                var name = response[i].key;
                 var element = document.getElementById(name);
                 element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
-                this.data[name] = response[i].streetsCount;
+                this.data[name] = response[i].docCount;
             }
         })
+
+
     }
 
     selectDistrict($event){
