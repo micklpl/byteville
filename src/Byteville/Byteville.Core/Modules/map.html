@@ -2,16 +2,13 @@
     <div id="mapPageContainer">
         <div id="mapNavbar">
             <div id="mapNavbarPanel">
-                <ul>
-                    <li>Liczba ogłoszeń</li>
-                    <li>Cena za metr kwadratowy</li>
-                    <li>Powierzchnia</li>
-                    <li>Cena</li>
-                    <li>Liczba pokoi</li>
-                    <li>Rok budowy</li>
+                <ul repeat.for="option of options">
+                    <li click.delegate="executeAggregation(option.field)">${option.name}</li>
                 </ul>
             </div>
-            <aggregation-results></aggregation-results>
+            <aggregation-results>
+                <h2>Wyniki agregacji</h2>
+            </aggregation-results>
         </div>
         <div id="mapContent">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:odm="http://product.corel.com/CGS/11/cddns/" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd"

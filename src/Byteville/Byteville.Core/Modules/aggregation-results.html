@@ -1,5 +1,49 @@
-﻿<template id="aggregation-results">    
-    <h1>Hello world</h1>
+﻿<template id="aggregation-results">
+    <style>
+        th{
+            font-size: 20px;
+            padding-bottom: 10px;
+            width: 150px;
+        }
+        
+        td{
+            width: 150px;
+        } 
+        
+        #container{
+            background-color: #F3E6E8;
+        }
+
+        :host{
+            margin-left: 100px;
+        }
+
+        ::content h2{
+            font-size: 26px;
+        }
+    </style>
+    
+    <div id="container">
+        <content select="h2"></content>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dzielnica</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                    <th>Średnia</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bronowice</td>
+                    <td>192 000</td>
+                    <td>742 000</td>
+                    <td>532 273</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>    
 </template>
 <script>
     (function() {
