@@ -15,6 +15,8 @@ export class Map{
     activate(){        
         this.data = {};
         this.details = undefined;
+        this.selectedOption = undefined;
+        this.aggregationsData = [];
 
         var self = this;
         self.countItems(self);        
@@ -29,6 +31,7 @@ export class Map{
                 var element = document.getElementById(name);
                 element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
                 self.data[name] = response[i].docCount;
+                self.aggregationsData = [];
             }
         })
     }
@@ -49,25 +52,28 @@ export class Map{
             });
 
             for(var i = 0; i < response.length; i++){
-                var name = response[i].key;
-                var element = document.getElementById(name);
+                let name = response[i].key;
+                let element = document.getElementById(name);
                 element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
             }
 
-            self.dataJSON = JSON.stringify(response.map(item => {
+            let aggregationsData = response.map(item => {
                 let stats = item.aggregations.inner_aggregation;
                 return{
                     key: item.key,
-                    avg: stats.average,
-                    min: stats.min,
-                    max: stats.max
+                    avg: stats.average.toFixed(2),
+                    min: stats.min.toFixed(2),
+                    max: stats.max.toFixed(2)
                 }
-            }));
+            });
+
+            document.querySelector('#aggs').setAttribute("aggregations", JSON.stringify(aggregationsData));
         })
     }
 
     executeAggregation(field){
         var self = this;
+        this.selectedOption = field;
 
         if(field){
             self.statsAggregation(self, field);

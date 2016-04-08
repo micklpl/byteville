@@ -6,8 +6,8 @@
                     <li click.delegate="executeAggregation(option.field)">${option.name}</li>
                 </ul>
             </div>
-            <aggregation-results>
-                <h2>Wyniki agregacji</h2>
+            <aggregation-results id="aggs" if.bind="aggregationsData !== undefined">
+                <h2>${selectedOption}</h2>
             </aggregation-results>
         </div>
         <div id="mapContent">

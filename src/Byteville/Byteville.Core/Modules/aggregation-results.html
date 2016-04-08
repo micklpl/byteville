@@ -34,14 +34,7 @@
                     <th>Średnia</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Bronowice</td>
-                    <td>192 000</td>
-                    <td>742 000</td>
-                    <td>532 273</td>
-                </tr>
-            </tbody>
+            <tbody id="districts-body"></tbody>
         </table>
     </div>    
 </template>
@@ -49,14 +42,51 @@
     (function() {
         var objectPrototype = Object.create(HTMLElement.prototype),
             selfDocument = document.currentScript.ownerDocument;
+        Object.defineProperties(objectPrototype, {
+            aggregations: {
+                writable: true
+            }
+        });
         objectPrototype.createdCallback = function() {
             var shadow = this.createShadowRoot(),
                 templateContent = selfDocument.querySelector('#aggregation-results').content,
                 templateNodes = document.importNode(templateContent, true);
             shadow.appendChild(templateNodes);
+            objectPrototype.tbody = shadow.querySelector("#districts-body");
         };
+
+        objectPrototype.attributeChangedCallback = function (attrName, oldVal, newVal) {
+            if (attrName === "aggregations") {
+                var aggs = JSON.parse(newVal);
+                var tbody = objectPrototype.tbody;
+                tbody.innerHTML = '';
+                for (var i = 0; i < aggs.length; i++) {
+                    var tr = document.createElement("TR");
+
+                    var td1 = document.createElement("TD");
+                    td1.innerText = aggs[i].key;
+                    tr.appendChild(td1);
+
+                    var td2 = document.createElement("TD");
+                    td2.innerText = aggs[i].min;
+                    tr.appendChild(td2);
+
+                    var td3 = document.createElement("TD");
+                    td3.innerText = aggs[i].max;
+                    tr.appendChild(td3);
+
+                    var td4 = document.createElement("TD");
+                    td4.innerText = aggs[i].avg;
+                    tr.appendChild(td4);
+
+                    tbody.appendChild(tr);
+                }
+            }
+        }
+
         var aggregationResultsElement = document.registerElement("aggregation-results", {
-            prototype: objectPrototype
+            prototype: objectPrototype,
+
         });
     })();
 </script>
