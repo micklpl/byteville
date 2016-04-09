@@ -12,8 +12,7 @@ open FSharp.Core.Operators.Unchecked
 [<AllowNullLiteral>]
 type FtsQueryModel() =
     member val q:string = null with get, set
-    member val datesFrom:string = null with get, set
-    member val datesTo:string = null with get, set
+    member val dateFrom:string = null with get, set
     member val priceFrom = defaultof<float> with get, set
     member val priceTo = defaultof<float> with get, set
     member val pricePerMeterFrom = defaultof<float> with get, set
@@ -30,7 +29,8 @@ type AdvertMetadata =
         Street: string;
         District: string;
         Title : string;
-        Md5: string
+        Md5: string;
+        CreationDate: DateTime
     }
 
 type FilterInequality =
@@ -75,6 +75,11 @@ type FtsController() =
                            yield CreateRangeQuery(LTE(y), name)                                    
         }
 
+    let CreateDatesRangeFilter(date, name) =
+        let datesRange = new Nest.DateRangeQuery()
+        datesRange.GreaterThanOrEqualTo <- DateMath.FromString(date)
+        datesRange.Field <- CreateNameField(name)
+        new QueryContainer(datesRange)
 
     let BuildQuery(model:FtsQueryModel) = 
         let req = new SearchRequest()
@@ -89,6 +94,9 @@ type FtsController() =
 
         CreateRangeQueries(model.priceFrom, model.priceTo, "TotalPrice") |> filters.AddRange
         CreateRangeQueries(model.pricePerMeterFrom, model.pricePerMeterTo, "PricePerMeter") |> filters.AddRange
+
+        if not(model.dateFrom = null) then
+            CreateDatesRangeFilter(model.dateFrom, "CreationDate") |> filters.Add
 
         boolQuery.Must <- filters        
         req.Query <- new QueryContainer(boolQuery)
