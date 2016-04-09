@@ -81,6 +81,19 @@ type FtsController() =
         datesRange.Field <- CreateNameField(name)
         new QueryContainer(datesRange)
 
+    let CreateQueryForToken(token:string) = 
+        let multiMatch = new Nest.MultiMatchQuery()
+        multiMatch.Operator <- new Nullable<Nest.Operator>(Operator.And)
+        multiMatch.Type <- new Nullable<Nest.TextQueryType>(TextQueryType.PhrasePrefix)    
+        let fields = [|"Title"; "Description"|]
+                  
+        multiMatch.Fields <- Nest.Fields.op_Implicit(fields)
+        multiMatch.Query <- token
+        new QueryContainer(multiMatch)
+
+    let CreateMultiMatchQuery(q:string) = 
+        q.Split[|' '|] |> Seq.map(fun token -> CreateQueryForToken(token))
+
     let BuildQuery(model:FtsQueryModel) = 
         let req = new SearchRequest()
         let boolQuery = new Nest.BoolQuery()
@@ -97,6 +110,9 @@ type FtsController() =
 
         if not(model.dateFrom = null) then
             CreateDatesRangeFilter(model.dateFrom, "CreationDate") |> filters.Add
+
+        if not(model.q = null) then
+            CreateMultiMatchQuery(model.q) |> filters.AddRange
 
         boolQuery.Must <- filters        
         req.Query <- new QueryContainer(boolQuery)
