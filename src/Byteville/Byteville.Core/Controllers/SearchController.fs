@@ -56,8 +56,6 @@ type SearchController() =
         let search = fun (client: ElasticClient, query: SearchRequest) -> 
             client.Search<AdministrationUnit>(query).Documents.ToArray()
        
-        let result = match search(client, prefixQuery) with
-                        | [||] -> search(client, BuildQuery("name", q, true))
-                        | documents -> documents
-
-        result
+        match search(client, prefixQuery) with
+                | [||] -> search(client, BuildQuery("name", q, true))
+                | documents -> documents

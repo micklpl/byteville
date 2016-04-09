@@ -141,6 +141,7 @@
     <Compile Include="Controllers\DistrictsController.fs" />
     <Compile Include="Controllers\ItemsController.fs" />
     <Compile Include="Controllers\SearchController.fs" />
+    <Compile Include="Controllers\FtsController.fs" />
     <Content Include="Web.config" />
     <Compile Include="NLogger.fs" />
     <Content Include="Global.asax" />
