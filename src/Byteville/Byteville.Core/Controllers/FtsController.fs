@@ -19,6 +19,8 @@ type FtsQueryModel() =
     member val pricePerMeterTo = defaultof<float> with get, set
     member val district:string = null with get,set
     member val street:string = null with get,set
+    member val positiveFields:string = null with get,set
+    member val negativeFields:string = null with get,set
 
 type AdvertMetadata =
     {
@@ -94,6 +96,15 @@ type FtsController() =
     let CreateMultiMatchQuery(q:string) = 
         q.Split[|' '|] |> Seq.map(fun token -> CreateQueryForToken(token))
 
+    let CreateBooleanQuery(field:string,value:bool) =
+        let query = new Nest.TermQuery()
+        query.Field <- CreateNameField(field)
+        query.Value <- value
+        new QueryContainer(query) 
+
+    let CreateBooleanQueries(fields:string, value:bool) = 
+        fields.Split[|','|] |> Seq.map(fun field -> CreateBooleanQuery(field, value))
+
     let BuildQuery(model:FtsQueryModel) = 
         let req = new SearchRequest()
         let boolQuery = new Nest.BoolQuery()
@@ -110,6 +121,12 @@ type FtsController() =
 
         if not(model.dateFrom = null) then
             CreateDatesRangeFilter(model.dateFrom, "CreationDate") |> filters.Add
+
+        if not(model.positiveFields = null) then
+            CreateBooleanQueries(model.positiveFields, true) |> filters.AddRange
+
+        if not(model.negativeFields = null) then
+            CreateBooleanQueries(model.negativeFields, false) |> filters.AddRange
 
         if not(model.q = null) then
             CreateMultiMatchQuery(model.q) |> filters.AddRange
