@@ -126,7 +126,7 @@ type FtsController() =
             CreateBooleanQueries(model.positiveFields, true) |> filters.AddRange
 
         if not(model.negativeFields = null) then
-            CreateBooleanQueries(model.negativeFields, false) |> filters.AddRange
+            CreateBooleanQueries(model.positiveFields, true) |> filters.AddRange
 
         if not(model.q = null) then
             CreateMultiMatchQuery(model.q) |> filters.AddRange

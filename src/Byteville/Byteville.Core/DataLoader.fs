@@ -61,7 +61,7 @@ type DataLoader() =
         x.CreateIndex("streets", mapping)
 
     member x.CreateAdvertsIndex() =
-        let mapping = """{"mappings":{"advert":{"properties":{"Street":{"type":"string","store":"yes","index":"not_analyzed"}, "District":{"type":"string","store":"yes","index":"not_analyzed"}, "Title":{"type":"string","store":"yes","index":"analyzed"}, "Description":{"type":"string","store":"yes","index":"analyzed"},"Md5":{"type":"string","store":"yes","index":"analyzed"}, "Url":{"type":"string","store":"yes","index":"analyzed"}, "TotalPrice": {"type": "double"}, "PricePerMeter": {"type": "double"}, "Area": {"type": "double"}, "CreationDate": {"type": "date"}}}}}"""
+        let mapping = """{"settings":{"analysis":{"tokenizer":"standard","filter":{"custom-stopwords":{"type":"stop","stopwords":["Kraków","mieszkanie"]},"min-length-3":{"type":"length","min":3}},"analyzer":{"trends-analyzer":{"type":"custom","tokenizer":"standard","filter":["lowercase","min-length-3","custom-stopwords"]}}}},"mappings":{"advert":{"properties":{"Street":{"type":"string","store":"yes","index":"not_analyzed"},"District":{"type":"string","store":"yes","index":"not_analyzed"},"Title":{"type":"string","store":"yes","index":"analyzed"},"Description":{"type":"string","store":"yes","index":"analyzed","analyzer":"trends-analyzer"},"Md5":{"type":"string","store":"yes","index":"analyzed"},"Url":{"type":"string","store":"yes","index":"analyzed"},"TotalPrice":{"type":"double"},"PricePerMeter":{"type":"double"},"Area":{"type":"double"},"CreationDate":{"type":"date"}}}}}"""
         x.CreateIndex("adverts", mapping)
 
     member x.IndexStreets(path: String) =        
