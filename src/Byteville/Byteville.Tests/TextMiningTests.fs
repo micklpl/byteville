@@ -57,6 +57,9 @@ type ClassifierTests() =
     
     [<Fact>]
     member x.Parsing_Without_Errors_Test() = 
+        let loader = new Byteville.Core.DataLoader()
+        loader.CreateAdvertsIndex() |> ignore
+
         let dir = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/adverts/"
         let adverts = new System.IO.DirectoryInfo(dir) |> fun di -> di.EnumerateFiles()
                         |> Seq.map(fun file -> Byteville.TextMining.loadFileFromDisk(file.FullName))
@@ -75,8 +78,7 @@ type ClassifierTests() =
                                        |> Seq.toArray
                                        |> String.concat "\n"   
                                                
-        let loader = new Byteville.Core.DataLoader()
-        loader.CreateAdvertsIndex() |> ignore
+        
         loader.SendAdverts(adverts)
 
         Assert.True(true)

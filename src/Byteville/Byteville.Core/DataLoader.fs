@@ -52,16 +52,24 @@ type DataLoader() =
             |> Array.filter(fun line -> not(Regex.IsMatch(line, ignoredUnits)))            
         matchingLines
 
-    member private x.CreateIndex(name, json) =
-        let client = new WebClient()
-        client.UploadString("http://localhost:9200/" + name, "PUT", json)
+    member private x.CreateIndex(name, json:string) =
+        let webAddr = "http://localhost:9200/" + name;
+        let httpWebRequest = WebRequest.Create(webAddr)
+        httpWebRequest.ContentType <- "application/json; charset=utf-8";
+        httpWebRequest.Method  <- "PUT";   
+        use writer = new StreamWriter(httpWebRequest.GetRequestStream())
+        writer.Write(json)
+        writer.Flush()
+
+        httpWebRequest.GetResponse()
+        
 
     member x.CreateStreetsIndex() =        
         let mapping = """{"mappings":{"administrationunit":{"properties":{"name":{"type":"string","store":"yes","index":"analyzed"},"allocationCode":{"type":"string","store":"yes","index":"not_analyzed"},"district":{"type":"string","store":"yes","index":"not_analyzed"}}}}}"""
         x.CreateIndex("streets", mapping)
 
     member x.CreateAdvertsIndex() =
-        let mapping = """{"settings":{"analysis":{"tokenizer":"standard","filter":{"custom-stopwords":{"type":"stop","stopwords":["Kraków","mieszkanie"]},"min-length-3":{"type":"length","min":3}},"analyzer":{"trends-analyzer":{"type":"custom","tokenizer":"standard","filter":["lowercase","min-length-3","custom-stopwords"]}}}},"mappings":{"advert":{"properties":{"Street":{"type":"string","store":"yes","index":"not_analyzed"},"District":{"type":"string","store":"yes","index":"not_analyzed"},"Title":{"type":"string","store":"yes","index":"analyzed"},"Description":{"type":"string","store":"yes","index":"analyzed","analyzer":"trends-analyzer"},"Md5":{"type":"string","store":"yes","index":"analyzed"},"Url":{"type":"string","store":"yes","index":"analyzed"},"TotalPrice":{"type":"double"},"PricePerMeter":{"type":"double"},"Area":{"type":"double"},"CreationDate":{"type":"date"}}}}}"""
+        let mapping = """{"settings":{"analysis":{"tokenizer":"standard","filter":{"custom-stopwords":{"type":"stop","stopwords":["Kraków","mieszkanie","się","jest","przy","oraz", "nie"]},"min-length-3":{"type":"length","min":3}},"analyzer":{"trends-analyzer":{"type":"custom","tokenizer":"standard","filter":["lowercase","min-length-3","custom-stopwords"]}}}},"mappings":{"advert":{"properties":{"Street":{"type":"string","store":"yes","index":"not_analyzed"},"District":{"type":"string","store":"yes","index":"not_analyzed"},"Title":{"type":"string","store":"yes","index":"analyzed"},"Description":{"type":"string","store":"yes","index":"analyzed","analyzer":"trends-analyzer"},"Md5":{"type":"string","store":"yes","index":"analyzed"},"Url":{"type":"string","store":"yes","index":"analyzed"},"TotalPrice":{"type":"double"},"PricePerMeter":{"type":"double"},"Area":{"type":"double"},"CreationDate":{"type":"date"}}}}}"""
         x.CreateIndex("adverts", mapping)
 
     member x.IndexStreets(path: String) =        
