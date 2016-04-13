@@ -27,7 +27,7 @@ type AdvertMetadata =
         TotalPrice: double;
         PricePerMeter: double;
         Area: double;
-        NumberOfRooms: double;
+        NumberOfRooms: Nullable<double>;
         Street: string;
         District: string;
         Title : string;
@@ -133,6 +133,14 @@ type FtsController() =
 
         boolQuery.Must <- filters        
         req.Query <- new QueryContainer(boolQuery)
+
+        let sort = new Nest.SortField()
+        sort.Field <- CreateNameField("CreationDate")
+        sort.Order <- new Nullable<SortOrder>(Nest.SortOrder.Descending)
+        let list = new System.Collections.Generic.List<ISort>()
+        list.Add(sort :> ISort)
+
+        req.Sort <- list
         req
 
     member x.Get([<FromUri>]queryModel:FtsQueryModel) : IHttpActionResult = 
