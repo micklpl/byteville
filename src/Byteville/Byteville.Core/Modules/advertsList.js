@@ -11,6 +11,10 @@ export class AdvertsList{
         client.get("api/fts/").then( response => {
             self.adverts = response.content;
         })
+
+        client.get("api/trends/").then( payload => {
+            self.trends = JSON.parse(payload.response).description.items;
+        })
     }
 }
 

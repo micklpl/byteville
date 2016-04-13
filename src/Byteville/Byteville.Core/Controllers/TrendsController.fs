@@ -33,7 +33,7 @@ type TrendsController() =
         field.Name <- "Description"
 
         aggregator.Field <- field
-        aggregator.Size <- new System.Nullable<int>(40)
+        aggregator.Size <- new System.Nullable<int>(15)
 
         let container = new AggregationContainer()
         container.Terms <- aggregator

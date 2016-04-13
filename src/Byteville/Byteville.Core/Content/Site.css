@@ -202,3 +202,24 @@
 .ad-street{
   font-size: 20px;
 }
+
+.trends{
+    margin-left: 20px;
+    margin-top: 200px;
+    position: absolute;
+    background-color: #F3E6E8;
+    color: #7F0011;
+    padding-right: 50px;
+}
+
+.trends h2{
+    color: #60000D;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-bottom: 20px;
+}
+
+.bv-trend{
+    list-style: none;
+    cursor: pointer;
+}

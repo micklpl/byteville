@@ -2,8 +2,14 @@
     <require from="./Helpers/date-format"></require>
     <require from="./Helpers/currency-format"></require>
     <require from="./Helpers/date-from-now"></require>
+    <div class="trends">
+        <h2>Trendy</h2>
+        <ul repeat.for="trend of trends">
+            <li class="bv-trend"><b>${trend.key}</b> (${trend.docCount})</li>
+        </ul>
+    </div>
     <div class="bv-menu-options">
-
+       
     </div>
     <div class="container">
         <div repeat.for="advert of adverts">
