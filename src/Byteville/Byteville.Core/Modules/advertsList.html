@@ -1,4 +1,29 @@
 ﻿<template>
-    <h2>Ogłoszenia - TODO</h2>
+    <require from="./Helpers/date-format"></require>
+    <require from="./Helpers/currency-format"></require>
+    <require from="./Helpers/date-from-now"></require>
+    <div class="bv-menu-options">
+
+    </div>
+    <div class="container">
+        <div repeat.for="advert of adverts">
+            <div class="search-result">
+                <h3 class="ad-title">${advert.title}</h3>
+                <div class="ad-middle-container">
+                    <div class="ad-price">
+                        ${advert.totalPrice | currencyFormat} zl / ${advert.area} m2 (${advert.pricePerMeter | currencyFormat} zl za m2)
+                    </div>
+                    <div class="ad-date">
+                        <div>${advert.creationDate | dateFormat}</div>
+                        <div>${advert.creationDate | dateFromNow}</div>
+                    </div>
+                </div>
+                <div class="ad-geo">
+                    <span class="ad-district">${advert.district}</span>,
+                    <span class="ad-street">${advert.street}</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 

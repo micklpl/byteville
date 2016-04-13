@@ -117,6 +117,9 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Modules\Helpers\date-from-now.js" />
+    <Content Include="Modules\Helpers\currency-format.js" />
+    <Content Include="Modules\Helpers\date-format.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\bootstrap.min.js" />

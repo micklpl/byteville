@@ -150,3 +150,55 @@
     float: left;
     padding-right: 100px;
 }
+
+.bv-menu-options{
+    width: 100%;
+    height: 100px;
+    background-color: #F3E6E8;
+}
+
+.search-result{
+  background-color: #F3E6E8;
+  color: #60000D;
+  width: 800px;
+  height: 150px;
+  margin-top: 20px;
+}
+
+.ad-title{
+  display: inline-block;
+  padding-left: 20px;
+  color: #7F0011;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.ad-date{
+  float: right;
+  display: inline-block;
+  padding-right: 10px;
+}
+
+.ad-price{
+  margin-left: 20px;
+  display: inline-block;
+}
+
+.ad-middle-container{
+  height: 50px;
+}
+
+.ad-geo{
+  margin-bottom: 20px;
+  color: #A23645;
+}
+
+.ad-district{
+  font-size: 24px;
+  margin-left: 20px
+}
+
+.ad-street{
+  font-size: 20px;
+}
