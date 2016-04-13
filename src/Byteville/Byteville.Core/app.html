@@ -1,5 +1,24 @@
 ﻿<template>
-    <!--<img src="/Items/Banner.png" class="centered-image">-->
-    <h3>menu</h3>
+    <nav class="navbar navbar-default navbar-fixed-top bv-navbar">        
+        <div class="container">
+            <ul class="nav navbar-nav">
+                <a class="logo" href="#">
+                    <img src="city.svg" height="50px;" />
+                </a>
+                <li>
+                    <a class="bv-menu-link" href="#estimator">Estymator</a>
+                </li>
+                <li>
+                    <a class="bv-menu-link" href="#recommendations">Rekomendacje</a>
+                </li>
+                <li>
+                    <a class="bv-menu-link" href="#districts">Dzielnice</a>
+                </li>
+                <li>
+                    <a class="bv-menu-link" href="#">Ogłoszenia</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
     <router-view></router-view>
 </template>

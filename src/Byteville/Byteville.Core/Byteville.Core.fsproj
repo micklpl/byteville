@@ -88,8 +88,7 @@
       </FlavorProperties>
       <FlavorProperties Guid="{349c5851-65df-11da-9384-00065b846f21}" User="">
         <WebProjectProperties>
-          <StartPageUrl>
-          </StartPageUrl>
+          <StartPageUrl>index.html</StartPageUrl>
           <StartAction>CurrentPage</StartAction>
           <AspNetDebugging>True</AspNetDebugging>
           <SilverlightDebugging>False</SilverlightDebugging>
@@ -103,7 +102,7 @@
           </StartCmdLineArguments>
           <StartWorkingDirectory>
           </StartWorkingDirectory>
-          <EnableENC>False</EnableENC>
+          <EnableENC>True</EnableENC>
           <AlwaysStartWebServerOnDebug>True</AlwaysStartWebServerOnDebug>
         </WebProjectProperties>
       </FlavorProperties>
@@ -127,6 +126,7 @@
     <Content Include="Scripts\jquery-1.9.0.js" />
     <Content Include="app.html" />
     <Content Include="package.json" />
+    <Content Include="city.svg" />
     <None Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="fonts\glyphicons-halflings-regular.ttf" />
     <None Include="fonts\glyphicons-halflings-regular.svg" />
@@ -155,12 +155,18 @@
     <Content Include="Modules\streetsSearch.js" />
     <Content Include="Modules\districtDetails.js" />
     <Content Include="Modules\districtDetails.html" />
-    <Content Include="Modules\districts.html" />
+    <Content Include="Modules\districts2.html" />
     <Content Include="Modules\streetsSearch.html" />
+    <Content Include="Modules\districts2.js" />
+    <Content Include="Modules\districts.html" />
     <Content Include="Modules\districts.js" />
-    <Content Include="Modules\map.html" />
-    <Content Include="Modules\map.js" />
     <Content Include="Modules\aggregation-results.html" />
+    <Content Include="Modules\estimator.js" />
+    <Content Include="Modules\estimator.html" />
+    <Content Include="Modules\recommendations.js" />
+    <Content Include="Modules\recommendations.html" />
+    <Content Include="Modules\advertsList.js" />
+    <Content Include="Modules\advertsList.html" />
     <None Include="NLog.xsd" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

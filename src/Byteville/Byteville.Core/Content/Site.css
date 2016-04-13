@@ -136,3 +136,17 @@
     list-style: none;
     padding-left: 0px;
 }
+
+.bv-navbar{
+     background-color: #60000D;  
+}
+
+.navbar-default .navbar-nav>li>a.bv-menu-link{
+    color: #F3E6E8;
+    cursor: pointer;    
+}
+
+.logo{
+    float: left;
+    padding-right: 100px;
+}

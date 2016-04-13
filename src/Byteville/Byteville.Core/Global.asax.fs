@@ -37,10 +37,18 @@ type Global() =
         GlobalConfiguration.Configuration.Services.Replace(typeof<ITraceWriter>, new NLogger());
 
         Global.InitializeData()
+        
         // Additional Web API settings
 
     member x.Application_Start() =
-        GlobalConfiguration.Configure(Action<_> Global.RegisterWebApi)        
+        GlobalConfiguration.Configure(Action<_> Global.RegisterWebApi) 
+        
+    member x.Application_BeginRequest() =
+        // Stop Caching in IE
+        x.Response.Cache.SetCacheability(System.Web.HttpCacheability.NoCache);
+
+        // Stop Caching in Firefox
+        x.Response.Cache.SetNoStore();           
 
     static member InitializeData() = 
         let dataLoader = new DataLoader()
