@@ -26,6 +26,12 @@
               name: 'districts', 
               moduleId: './Modules/districts', 
               nav: false 
+          },
+          { 
+              route: 'streets/:name', 
+              name: 'streets', 
+              moduleId: './Modules/streets', 
+              nav: false 
           }
         ]);
 

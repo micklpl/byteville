@@ -172,6 +172,8 @@
     <Content Include="Index.html" />
     <Content Include="packages.config" />
     <Content Include="readme.txt" />
+    <Content Include="Modules\streets.html" />
+    <Content Include="Modules\streets.js" />
     <None Include="NLog.xsd" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
