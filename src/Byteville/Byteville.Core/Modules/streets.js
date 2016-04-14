@@ -6,14 +6,7 @@ export class Streets{
     }
     
     activate(params){
-        this.name = params.name + ",Kraków";
-        let self = this;
-        let geocoder = new google.maps.Geocoder();
-
-        geocoder.geocode( {'address': this.name}, (res, status) => {
-            self.coordinates = res[0].geometry.location;
-            this.findPlaces(self.coordinates);
-        });
+        this.name = params.name + ",Kraków";        
     }
 
     findPlaces(coords){
@@ -23,5 +16,34 @@ export class Streets{
         geocoder.geocode( {'latLng': self.coordinates}, (res, status) => {
             console.log(res);
         });
+    }
+
+    attached(){
+        let self = this;
+        let geocoder = new google.maps.Geocoder();
+
+        geocoder.geocode( {'address': this.name}, (res, status) => {
+            self.coordinates = res[0].geometry.location;
+            this.createMap(self.coordinates);
+        });
+
+
+    }
+
+    createMap(coordinates){
+        let mapProp = {
+            center:coordinates,
+            zoom:17,
+            mapTypeId:google.maps.MapTypeId.ROADMAP
+        };
+        this.map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
+
+        let marker = new google.maps.Marker({
+            position: coordinates,
+            map: this.map,
+            title: this.name
+        });
+
+        marker.setMap(this.map);
     }
 }

@@ -4,6 +4,7 @@
       "aurelia-binding": "npm:aurelia-binding@^1.0.0-beta.1.2.2",
       "aurelia-bootstrapper": "npm:aurelia-bootstrapper@^1.0.0-beta.1.1.4",
       "aurelia-framework": "npm:aurelia-framework@^1.0.0-beta.1.1.4",
+      "aurelia-google-maps": "npm:aurelia-google-maps@^1.0.7",
       "aurelia-http-client": "npm:aurelia-http-client@^1.0.0-beta.1.1.2",
       "moment": "npm:moment@^2.12.0",
       "numeral": "npm:numeral@^1.5.3"
