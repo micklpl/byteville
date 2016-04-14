@@ -2,6 +2,7 @@
     <require from="./Helpers/date-format"></require>
     <require from="./Helpers/currency-format"></require>
     <require from="./Helpers/date-from-now"></require>
+    <require from="./Controls/districts-filter"></require>
     <div class="trends">
         <h2>Trendy</h2>
         <ul repeat.for="trend of trends">
@@ -9,7 +10,10 @@
         </ul>
     </div>
     <div class="bv-menu-options">
-       
+        <div class="bv-search">
+            <input autofocus type="text" placeholder="Czego szukasz ?" value.bind="params.q & throttle:500" />
+        </div>
+        <districts-filter selected-district.bind="params.district" change.delegate="filterChanged()"></districts-filter>
     </div>
     <div class="container">
         <div repeat.for="advert of adverts">

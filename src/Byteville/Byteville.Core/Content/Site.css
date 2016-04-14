@@ -223,3 +223,31 @@
     list-style: none;
     cursor: pointer;
 }
+
+@media all and (max-width: 1600px) {
+  .trends{
+      display: none;
+  }
+}
+
+.bv-search input{
+    width: 100%;
+    color: #C5B6B8;
+    height: 50px;
+    font-size: 20px;
+    background-color: #F3E6E8;
+}
+
+.dropdown-toggle{
+    color: #C5B6B8;
+    background-color: #F3E6E8;
+    height: 50px;
+    width: 150px;
+}
+
+.dropdown-menu>li>a.district-filter{
+    color: #7F0011;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    cursor: pointer;
+}

@@ -1,0 +1,13 @@
+﻿<template bindable="selectedDistrict">
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            ${selectedDistrict || "Dzielnica"} 
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+           <li repeat.for="district of districts">
+                <a class="district-filter" click.delegate="selectItem(district)">${district}</a>
+           </li>      
+        </ul>
+    </div>
+</template>
