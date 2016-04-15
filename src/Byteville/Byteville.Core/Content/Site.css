@@ -251,3 +251,25 @@
     padding-bottom: 4px;
     cursor: pointer;
 }
+
+.my-place-btn{
+    margin-top: 20px;
+    width: 120px;
+    height: 30px;
+    background-color: #60000D;
+    color: #F3E6E8;
+}
+
+.my-place{
+    width: 200px;
+    height: 30px;
+    margin-right: 50px;
+    background-color: #F3E6E8;
+    color: #7F0011;
+}
+
+.distance-result{
+    color: #60000D;
+    margin-top: 20px;
+    font-size: 20px;
+}

@@ -59,6 +59,7 @@ export class Streets{
             let directionsService = new google.maps.DirectionsService;
             let directionsDisplay = new google.maps.DirectionsRenderer;
             directionsDisplay.setMap(self.map);
+            self.placeCoordinates = placeCoordinates;
 
             directionsService.route({
                 origin: self.coordinates,
@@ -68,10 +69,26 @@ export class Streets{
             (response, status) => {
                 if (status === google.maps.DirectionsStatus.OK) {
                     directionsDisplay.setDirections(response);
+                    this.calculateDistance();
                 }
             });
         });
     }
 
+    calculateDistance(){
+        let distanceMatrixService = new google.maps.DistanceMatrixService();
+        let self = this;
+
+        distanceMatrixService.getDistanceMatrix(
+        {
+            origins: [this.coordinates],
+            destinations: [this.placeCoordinates],
+            travelMode: google.maps.TravelMode.DRIVING,
+        }, (response, status) =>{
+            let val = response.rows[0].elements[0];
+            self.timeToWork = val.duration.text;
+            self.kilometers = val.distance.text;
+        });        
+    }
 
 }
