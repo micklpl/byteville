@@ -137,6 +137,8 @@
     <Content Include="Modules\Controls\aggregation-results.html" />
     <Content Include="Modules\Controls\districts-filter.html" />
     <Content Include="Modules\Controls\districts-filter.js" />
+    <Content Include="Modules\streets.html" />
+    <Content Include="Modules\streets.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -172,8 +174,6 @@
     <Content Include="Index.html" />
     <Content Include="packages.config" />
     <Content Include="readme.txt" />
-    <Content Include="Modules\streets.html" />
-    <Content Include="Modules\streets.js" />
     <None Include="NLog.xsd" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

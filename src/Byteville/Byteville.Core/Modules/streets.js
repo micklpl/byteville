@@ -1,6 +1,8 @@
 ﻿import {HttpClient} from "aurelia-http-client"
 
 export class Streets{
+    myPlace = "";
+
     constructor(){
         this.coordinates = {};
     }
@@ -20,14 +22,15 @@ export class Streets{
 
     attached(){
         let self = this;
-        let geocoder = new google.maps.Geocoder();
-
-        geocoder.geocode( {'address': this.name}, (res, status) => {
+        this.geocode(self.name, (res, status) => {
             self.coordinates = res[0].geometry.location;
             this.createMap(self.coordinates);
         });
+    }
 
-
+    geocode(name, cb){
+        let geocoder = new google.maps.Geocoder();
+        geocoder.geocode( {'address': name}, cb);
     }
 
     createMap(coordinates){
@@ -46,4 +49,29 @@ export class Streets{
 
         marker.setMap(this.map);
     }
+
+    getRoute(){
+        let self = this;
+
+        this.geocode(this.myPlace, (res, status) => {
+            let placeCoordinates = res[0].geometry.location;
+            
+            let directionsService = new google.maps.DirectionsService;
+            let directionsDisplay = new google.maps.DirectionsRenderer;
+            directionsDisplay.setMap(self.map);
+
+            directionsService.route({
+                origin: self.coordinates,
+                destination: placeCoordinates,
+                travelMode: google.maps.TravelMode.DRIVING
+            }, 
+            (response, status) => {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
+                }
+            });
+        });
+    }
+
+
 }
