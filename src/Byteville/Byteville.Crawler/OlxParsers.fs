@@ -102,5 +102,6 @@ let olxAdvertParser(html:HtmlDocument, link:String) =
         Basement = None; Balcony = None;
         Heating = None; Parking = None;
         District = None; Street = None;
+        Location = None;
     }
 

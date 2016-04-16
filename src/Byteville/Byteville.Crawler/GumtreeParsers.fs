@@ -88,6 +88,7 @@ let gumtreeAdvertParser(html:HtmlDocument, link:String) =
         Basement = None; Balcony = None;
         Heating = None; Parking = parking;
         District = None; Street = None;
+        Location = None;
     }
 
 

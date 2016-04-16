@@ -9,6 +9,7 @@ open Byteville.Crawler.Helpers
 open Byteville.Crawler.Parsers.Olx
 open Byteville.Crawler.Parsers.Morizon
 open Byteville.Crawler.Parsers.Gumtree
+open GeocodeSharp.Google
 
 let loadFileFromDisk path = 
     async{
@@ -133,6 +134,20 @@ let tryParseDistrict(text:String) =
         | _ -> if text.Contains("Prokocim") || text.Contains("Bieżanów") 
                 then Some("Prokocim-Bieżanów") else None
 
+//można wstawić jako parametr klucz, wtedy nas nie obowiązują
+//limity na adres IP, ale nie wbiję do githuba ;P
+let client = new GeocodeClient()
+
+let nameToLocation(name) = 
+    async{
+        try
+            let! response = client.GeocodeAddress(name + ", Kraków") |> Async.AwaitTask
+            let location = response.Results.[0].Geometry.Location
+            return Some({lat = location.Latitude; lon = location.Longitude})
+        with
+            | :? System.IndexOutOfRangeException -> return None
+    }
+
 let classifyAdvert(asyncStream:Async<Stream>) = 
     async{
         let! stream = asyncStream
@@ -163,6 +178,10 @@ let classifyAdvert(asyncStream:Async<Stream>) =
                 advert.Value.District <- match tryParseDistrict(advert.Value.Title) with
                                                 | None -> tryParseDistrict(advert.Value.Description)
                                                 | x -> x
+
+        if advert.IsSome && advert.Value.Street.IsSome then
+            let! location = nameToLocation(advert.Value.Street.Value)            
+            advert.Value.Location <- location
 
         return advert
     }

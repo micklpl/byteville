@@ -4,6 +4,11 @@ open FSharp.Data.UnitSystems.SI.UnitSymbols
 
 [<Measure>] type PLN
 
+type Location = {
+    lat: float;
+    lon: float
+    }
+
 type Advert = {
     Title: String;
     Description: String;
@@ -23,10 +28,11 @@ type Advert = {
     Basement: Option<bool>;
     Balcony: Option<bool>;
     Heating: Option<string>;
-    Parking: Option<string>;   
+    Parking: Option<string>;
 
     mutable Street: Option<string>;
     mutable District: Option<string>;
+    mutable Location: Option<Location>
 }
 
 exception IncorrectAdvert of string

@@ -67,9 +67,12 @@ type ClassifierTests() =
                         |> Async.Parallel |> Async.RunSynchronously
                         |> Seq.filter(fun ad -> ad.IsSome)
                         |> Seq.map(fun ad -> ad.Value)
+                        
+                        
 
         let detected = adverts |> Seq.filter(fun ad -> ad.Street.IsSome) |> Seq.length
         let districtsOnly = adverts |> Seq.filter(fun ad -> ad.Street.IsNone && ad.District.IsSome) |> Seq.length
+        let geocoded = adverts |> Seq.filter(fun ad -> ad.Location.IsSome) |> Seq.length
 
         let withoutDistrict = adverts |> Seq.filter(fun ad -> ad.District.IsNone) |> Seq.length
 

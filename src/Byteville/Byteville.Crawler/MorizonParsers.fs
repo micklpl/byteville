@@ -123,4 +123,5 @@ let morizonAdvertParser(html:HtmlDocument, link:String) =
         Elevator = elevator; Basement = basement;
         Balcony = balcony; Heating = heating;
         Parking = None; District = None; Street = None;
+        Location = None;
     }
