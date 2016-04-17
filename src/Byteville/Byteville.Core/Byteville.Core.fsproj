@@ -165,6 +165,7 @@
     <Compile Include="Controllers\SearchController.fs" />
     <Compile Include="Controllers\FtsController.fs" />
     <Compile Include="Controllers\TrendsController.fs" />
+    <Compile Include="Controllers\RecommendationsController.fs" />
     <Content Include="Web.config" />
     <Compile Include="NLogger.fs" />
     <Content Include="Global.asax" />

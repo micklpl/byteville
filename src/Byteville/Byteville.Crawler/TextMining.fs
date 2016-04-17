@@ -179,8 +179,14 @@ let classifyAdvert(asyncStream:Async<Stream>) =
                                                 | None -> tryParseDistrict(advert.Value.Description)
                                                 | x -> x
 
-        if advert.IsSome && advert.Value.Street.IsSome then
-            let! location = nameToLocation(advert.Value.Street.Value)            
+        if advert.IsSome then
+            let advertVal = advert.Value
+            let locationName = match (advertVal.Street, advertVal.District) with
+                                | Some(x), _ ->  x
+                                | None, Some(y) -> y
+                                | _, None -> "Kraków"
+
+            let! location = nameToLocation(locationName)            
             advert.Value.Location <- location
 
         return advert
