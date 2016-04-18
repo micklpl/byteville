@@ -298,3 +298,15 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+.has-value{
+    color: #7F0011;
+}
+
+.bv-filters{
+    display: inline;
+}
+
+.dropdown{
+    display: inherit;
+}

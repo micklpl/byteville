@@ -1,0 +1,16 @@
+﻿<template bindable="selectedDistrict">
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span class.bind="selectedSpanName !== undefined ? 'has-value': ''">
+                ${selectedSpanName || "Kiedykolwiek"}
+            </span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            <li repeat.for="timespanOption of timespanOptions">
+                <a class="district-filter" click.delegate="selectItem(timespanOption)">${timespanOption.name}</a>
+            </li>
+        </ul>
+    </div>
+</template>
+

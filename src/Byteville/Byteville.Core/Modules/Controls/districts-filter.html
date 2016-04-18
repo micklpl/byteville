@@ -1,7 +1,9 @@
 ﻿<template bindable="selectedDistrict">
     <div class="dropdown">
         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            ${selectedDistrict || "Dzielnica"} 
+            <span class.bind="selectedDistrict !== '' ? 'has-value': ''">
+                ${selectedDistrict || "Dzielnica"}
+            </span> 
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
