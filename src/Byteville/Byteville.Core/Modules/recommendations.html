@@ -1,19 +1,42 @@
 ﻿<template>
-    <div class="container survey-container">
+    <require from="./Helpers/date-format"></require>
+    <require from="./Helpers/currency-format"></require>
+    <require from="./Helpers/date-from-now"></require>
+    <div class="container survey-container" if.bind="results === undefined">
         <h2>Ankieta preferencji</h2>
         <span>Postaramy sie znaleźć dla Ciebie optymalne oferty. Potrzebujemy kilka szczegółów na temat Twoich oczekiwań</span>
         <h4>I. Miejsce</h4>
-        <span>
-            <input type="text" />
-            <input type="button" value="Wyszukaj" />
-            <span>Wynik wyszukiwania</span>
+        <span if.bind="address === undefined">
+            <input type="text" placeholder="Adres, nazwa miejsca" value.bind="placeDesc" />
+            <input type="button" value="Wyszukaj" class="bv-btn" click.delegate="geocode()" />            
         </span>
-        <h4>II. Cena</h4>
-        <input type="text" />
-        <h4>III. Powierzchnia</h4>
-        <input type="text" />
+        <span if.bind="address !== undefined">${address} (${lat}, ${lon})</span>
+        <h4>II. Cena [PLN]</h4>
+        <input type="text" value.bind="price" />
+        <h4>III. Powierzchnia [m<sup>2</sup>]</h4>
+        <input type="text" value.bind="area" />
         <div>
-            <input type="button" value="Wyświetl propozycje" />
+            <input type="button" value="Wyświetl propozycje" class="bv-btn rec-btn" click.delegate="getRecommendations()" />
         </div>
     </div>    
+    <div class="container" if.bind="results !== undefined">
+        <div repeat.for="advert of results">
+            <div class="search-result">
+                <h3 class="ad-title">${advert.advertMetadata.title}</h3>
+                <div class="ad-middle-container">
+                    <div class="ad-price">
+                        ${advert.advertMetadata.totalPrice | currencyFormat} zl / ${advert.advertMetadata.area} m2 (${advert.advertMetadata.pricePerMeter | currencyFormat} zl za m2)
+                    </div>
+                    <div class="ad-date">
+                        <div>${advert.advertMetadata.creationDate | dateFormat}</div>
+                        <div>${advert.advertMetadata.creationDate | dateFromNow}</div>
+                    </div>
+                </div>
+                <div class="ad-geo">
+                    <span class="ad-district">${advert.advertMetadata.district}</span>,
+                    <span class="ad-street"><a href="/#streets/${advert.advertMetadata.street}">${advert.advertMetadata.street}</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>

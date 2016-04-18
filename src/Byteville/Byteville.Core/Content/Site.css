@@ -280,3 +280,21 @@
     padding-top: 20px;
     padding-bottom: 20px;
 }
+
+.survey-container h4{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.bv-btn{
+    width: 120px;
+    height: 30px;
+    background-color: #60000D;
+    color: #F3E6E8;
+}
+
+.rec-btn{
+    width: 200px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

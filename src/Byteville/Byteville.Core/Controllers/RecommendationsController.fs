@@ -53,16 +53,16 @@ type RecommendationsController() =
 
         distGauss
 
-    let PriceLinearQuery(price) =         
-        let priceLin = new Nest.GaussDecayFunction()
+    let PriceGaussQuery(price) =         
+        let priceGauss = new Nest.GaussDecayFunction()
 
-        priceLin.Field <- CreateNameField("TotalPrice")
-        priceLin.Offset <- new Nullable<float>(0.1 * price)
-        priceLin.Scale <- new Nullable<float>(0.25 * price)
-        priceLin.Origin <- new Nullable<float>(0.95 * price)
-        priceLin.Weight <- new Nullable<float>(2.0) 
+        priceGauss.Field <- CreateNameField("TotalPrice")
+        priceGauss.Offset <- new Nullable<float>(0.1 * price)
+        priceGauss.Scale <- new Nullable<float>(0.25 * price)
+        priceGauss.Origin <- new Nullable<float>(0.95 * price)
+        priceGauss.Weight <- new Nullable<float>(2.0) 
 
-        priceLin
+        priceGauss
 
     let AreaLinearQuery(area) =         
         let areaLin = new Nest.LinearDecayFunction()
@@ -83,12 +83,11 @@ type RecommendationsController() =
         let functions = new List<IScoreFunction>()
 
         GeoDistanceQuery(query.lat, query.lon) |> functions.Add
-        PriceLinearQuery(query.price) |> functions.Add
+        PriceGaussQuery(query.price) |> functions.Add
         AreaLinearQuery(query.area) |> functions.Add
         score.Functions <- functions
        
         req.Query <- new QueryContainer(score)
-        req.MinScore <- new Nullable<float>(0.00)
 
         let result = client.Search<AdvertMetadata>(req).Hits.ToArray() 
                         |> Array.map(fun hit -> {AdvertMetadata = hit.Source; 
