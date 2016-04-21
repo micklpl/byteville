@@ -10,10 +10,9 @@ open FSharp.Data
 type DistrictProvider() as this = 
    inherit TypeProviderForNamespaces()
 
-   let createPropertyBody district ([districts]) = <@@ district @@>
-
    let assembly = System.Reflection.Assembly.GetExecutingAssembly()
    let ns = "Byteville.DistrictProvider"
+      
    let districtProviderType = 
         ProvidedTypeDefinition(assembly, ns, "DistrictProvider", None)
 
@@ -29,8 +28,11 @@ type DistrictProvider() as this =
 
        city 
        |> getDistricts
-       |> Seq.map(fun dist -> 
-            ProvidedProperty(dist, typeof<string>, GetterCode = createPropertyBody dist))
+       |> Seq.map(fun mapItem -> 
+            ProvidedProperty(mapItem.Key, typeof<DistrictInfo>, 
+                GetterCode = fun [map] -> 
+                    let key = mapItem.Key
+                    <@@ ((%%map:obj) :?> Map<string, DistrictInfo>).[key] @@>))
             |> Seq.toList
             |> ty.AddMembers      
        
