@@ -3,6 +3,7 @@
 open Microsoft.FSharp.Core.CompilerServices
 open ProviderImplementation.ProvidedTypes
 open FSharp.Data
+open Microsoft.FSharp.Quotations
 
 #nowarn "0025"
 
@@ -26,13 +27,12 @@ type DistrictProvider() as this =
 
        ty.AddMember ctor
 
-       city 
-       |> getDistricts
-       |> Seq.map(fun mapItem -> 
-            ProvidedProperty(mapItem.Key, typeof<DistrictInfo>, 
-                GetterCode = fun [map] -> 
-                    let key = mapItem.Key
-                    <@@ ((%%map:obj) :?> Map<string, DistrictInfo>).[key] @@>))
+       city |> getDistricts
+            |> Seq.map(fun mapItem ->
+                ProvidedProperty(mapItem.Key, typeof<Map<string,string>>,
+                    GetterCode = fun [map] ->
+                        let key = mapItem.Key
+                        <@@ ((%%map:obj) :?> Map<string, seq<string*string>>).[key] |> Map.ofSeq @@>))
             |> Seq.toList
             |> ty.AddMembers      
        

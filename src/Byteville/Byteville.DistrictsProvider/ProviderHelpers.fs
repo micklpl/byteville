@@ -2,35 +2,42 @@
 module ProviderHelpers
 
 open FSharp.Data
+open ProviderImplementation.ProvidedTypes
 
-type DistrictInfo = {
-    ``Powierzchnia [ha]``: float;
-    ``Liczba stałych mieszkańców`` : int;
-    ``Zagęszczenie ludności [osób/km²]`` : float;
-}
+let cityFromBaseString city =
+    match city with
+        | "Kraków" -> "Krakowa"
+        | "Warszawa" -> "Warszawy"
+        | "Szczecin" -> "Szczecina"
+        | "Wrocław" -> "Wrocławia"
+        | "Katowice" -> "Katowic"
+        | "Poznań" -> "Poznania"
+        | "Gdańsk" -> "Gdańska"
+        | "Opole" -> "Opola"
+        | "Olsztyn" -> "Olsztyna"
+        | _ -> ""
 
-let tableRowToDistrictInfo(tr:seq<HtmlNode>) = 
-    let item i = tr |> Seq.item(i) |> fun i -> i.InnerText()
-    match tr |> Seq.length with
-        | 5 -> Some { 
-                ``Powierzchnia [ha]`` = 
-                    item 2 |> System.Double.Parse;
-                ``Liczba stałych mieszkańców`` = 
-                    item 3 |> System.Int32.Parse;
-                ``Zagęszczenie ludności [osób/km²]`` = 
-                    item 4 |> System.Double.Parse;
-                } 
-        | _ -> None
+
+let tableRowToMap(trs:seq<HtmlNode>) = 
+    let header = trs |> Seq.map(fun tr -> tr.Descendants("th"))
+                     |> Seq.find(fun th -> (th |> Seq.length > 0))
+                     |> Seq.map(fun th -> th.InnerText())
+
+    trs |> Seq.map(fun tr -> (tr.Descendants("a") |> Seq.tryHead, 
+                                tr.Descendants("td") 
+                                |> Seq.map(fun t -> t.InnerText())))
+        |> Seq.filter(fun pair -> fst(pair) |> fun a -> a.IsSome)
+        |> Seq.map(fun p -> (fst(p)
+                                |> fun a-> a.Value.InnerText(), 
+                                            snd(p) |> Seq.zip header))
+        |> Map.ofSeq
 
     
 
 let getDistricts(city) = 
-    let doc = HtmlDocument.Load("https://pl.wikipedia.org/wiki/Podzia%C5%82_administracyjny_"+ city)
-    doc.Descendants("table") |> Seq.head
+    let city = city |> cityFromBaseString
+    HtmlDocument.Load("https://pl.wikipedia.org/wiki/Podzia%C5%82_administracyjny_"+ city)
+        .Descendants("table") |> Seq.head
         |> fun item -> item.Descendants("tr")
-        |> Seq.map(fun tr -> (tr.Descendants("a") |> Seq.tryHead, 
-                                tr.Descendants("td") |> tableRowToDistrictInfo))
-        |> Seq.filter(fun pair -> fst(pair) |> fun a -> a.IsSome)
-        |> Seq.map(fun pair -> (fst(pair) |> fun a-> a.Value.InnerText(), snd(pair).Value))
-        |> Map.ofSeq
+        |> tableRowToMap
 
