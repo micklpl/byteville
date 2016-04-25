@@ -161,7 +161,7 @@
     <Compile Include="Models\Car.fs" />
     <Compile Include="Models\Advert.fs" />
     <Compile Include="DataLoader.fs" />
-    <Compile Include="UnityResolver.fs" />
+    <Compile Include="MemoryCacheFilterAttribute.fs" />
     <Compile Include="Controllers\AggregationsController.fs" />
     <Compile Include="Controllers\DistrictsController.fs" />
     <Compile Include="Controllers\ItemsController.fs" />
@@ -171,6 +171,7 @@
     <Compile Include="Controllers\RecommendationsController.fs" />
     <Content Include="Web.config" />
     <Compile Include="NLogger.fs" />
+    <Compile Include="UnityResolver.fs" />
     <Content Include="Global.asax" />
     <Compile Include="Global.asax.fs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -239,6 +240,7 @@
       <HintPath>$(SolutionDir)\packages\Microsoft.AspNet.WebApi.Client.5.2.2\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices.dll" />
     <Reference Include="System.Web.Http">

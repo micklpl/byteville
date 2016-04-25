@@ -38,6 +38,7 @@ type TrendsController(client:ElasticClient) =
 
     member val Client = client with get,set
 
+    [<MemoryCacheFilter("trends")>]
     member x.Get() : IHttpActionResult = 
         let query = new SearchRequest()
         query.Query <- LastMonthFilter()
