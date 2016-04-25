@@ -13,16 +13,12 @@ open Byteville.Core.Models
 
 type District2 = { name:string; streetsCount:int}
 
-type DistrictsController() =
+type DistrictsController(client:ElasticClient) =
     inherit ApiController()
 
-    let GetElasticClient() = 
-        let node = new Uri("http://localhost:9200")
-        let settings = new ConnectionSettings(node)        
-        new ElasticClient(settings.DefaultIndex("adverts"))
+    member val Client = client with get,set
 
-    member x.Get() =      
-        let client = GetElasticClient()
+    member self.Get() =
 
         let searchRequest = new SearchRequest()
         let dictionary = new Dictionary<string, IAggregationContainer>()
@@ -41,11 +37,10 @@ type DistrictsController() =
         dictionary.Add("districts_by_popularity", container)
         searchRequest.Aggregations <- new AggregationDictionary(dictionary)
 
-        client.Search<AdvertBase>(searchRequest).Aggs.Terms("districts_by_popularity").Buckets.ToArray()
+        self.Client.Search<AdvertBase>(searchRequest).Aggs.Terms("districts_by_popularity").Buckets.ToArray()
         |> Array.map(fun d -> { name = d.Key; streetsCount = int32(d.DocCount.Value); })
 
-    member self.Get(id: string)  =  
-        let client = GetElasticClient()
+    member self.Get(id: string)  =
 
         let searchRequest = new SearchRequest()
         let termQuery = TermQuery()
@@ -56,5 +51,5 @@ type DistrictsController() =
         searchRequest.Query <- new QueryContainer(termQuery)
         searchRequest.Size <- System.Nullable<int>(300)
          
-        client.Search<AdministrationUnit>(searchRequest).Documents.ToArray()
+        self.Client.Search<AdministrationUnit>(searchRequest).Documents.ToArray()
         |> Array.map(fun doc -> doc.Name)

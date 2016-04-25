@@ -20,7 +20,7 @@ type RecommendationsQueryModel() =
     member val price:float = 300000.0 with get, set
     member val area:float = 50.0 with get, set
 
-type RecommendationsController() =
+type RecommendationsController(client:ElasticClient) =
     inherit ApiController()
 
     let GetElasticClient(index) = 
@@ -75,8 +75,9 @@ type RecommendationsController() =
 
         areaLin
 
+    member val Client = client with get,set
+
     member x.Get([<FromUri>]query:RecommendationsQueryModel) = 
-        let client = GetElasticClient("adverts")
         let req = new SearchRequest()
 
         let score = new Nest.FunctionScoreQuery()
@@ -89,7 +90,7 @@ type RecommendationsController() =
        
         req.Query <- new QueryContainer(score)
 
-        let result = client.Search<AdvertMetadata>(req).Hits.ToArray() 
+        let result = x.Client.Search<AdvertMetadata>(req).Hits.ToArray() 
                         |> Array.map(fun hit -> {AdvertMetadata = hit.Source; 
                                                     Score = hit.Score})
 

@@ -39,13 +39,8 @@ type FilterInequality =
    | LTE of value: float
    | GTE of value: float
 
-type FtsController() =
-    inherit ApiController()
-
-    let GetElasticClient(index) = 
-        let node = new Uri("http://localhost:9200")
-        let settings = new ConnectionSettings(node)        
-        new ElasticClient(settings.DefaultIndex(index))
+type FtsController(client:ElasticClient) =
+    inherit ApiController()    
 
     let CreateNameField(name) =
         let field = new Field()
@@ -143,8 +138,9 @@ type FtsController() =
         req.Sort <- list
         req
 
+    member val Client = client with get,set
+
     member x.Get([<FromUri>]queryModel:FtsQueryModel) : IHttpActionResult = 
-        let client = GetElasticClient("adverts")
         let query = BuildQuery(queryModel)
-        let result = client.Search<AdvertMetadata>(query).Documents.ToArray()
+        let result = x.Client.Search<AdvertMetadata>(query).Documents.ToArray()
         x.Ok(result) :> IHttpActionResult

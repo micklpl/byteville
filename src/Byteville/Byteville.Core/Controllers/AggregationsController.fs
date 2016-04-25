@@ -24,13 +24,10 @@ type QueryModel() =
     member val statsField:string = null with get, set
 
 
-type AggregationsController() =
+type AggregationsController(client:ElasticClient) =
     inherit ApiController()
 
-    let GetElasticClient() = 
-        let node = new Uri("http://localhost:9200")
-        let settings = new ConnectionSettings(node)        
-        new ElasticClient(settings.DefaultIndex("adverts"))
+    member val Client = client with get,set
 
     member x.TermsAggregation(fieldName, size, statsField) = 
         let aggregator = new Nest.TermsAggregation(fieldName)
@@ -85,7 +82,6 @@ type AggregationsController() =
     
     member x.Get(field: string, [<FromUri>]query:QueryModel) : IHttpActionResult =   
                  
-        let client = GetElasticClient()
         let searchRequest = new SearchRequest()
         let dictionary = new Dictionary<string, IAggregationContainer>()
 
@@ -100,7 +96,7 @@ type AggregationsController() =
 
         searchRequest.Aggregations <- new AggregationDictionary(dictionary)
 
-        let aggs = client.Search<AdvertBase>(searchRequest).Aggs
+        let aggs = x.Client.Search<AdvertBase>(searchRequest).Aggs
 
         match aggs.Terms("outer_aggregation").Buckets.ToArray() with
                 | [||] -> x.Ok(aggs.Range("outer_aggregation").Buckets.ToArray()) :> _

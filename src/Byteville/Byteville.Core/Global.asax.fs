@@ -7,6 +7,8 @@ open System.Web.Http
 open System.Web.Routing
 open System.Web.Http.Tracing
 open Newtonsoft.Json
+open Microsoft.Practices.Unity
+open Nest
 
 type HttpRoute = {
     controller : string
@@ -39,6 +41,16 @@ type Global() =
         Global.InitializeData()
         
         // Additional Web API settings
+
+        //Unity
+        let container = new UnityContainer()
+
+        let node = new Uri("http://localhost:9200")
+        let settings = new ConnectionSettings(node)        
+        let client = new ElasticClient(settings.DefaultIndex("adverts"))
+        container.RegisterInstance(client) |> ignore
+
+        config.DependencyResolver <- new UnityResolver(container)
 
     member x.Application_Start() =
         GlobalConfiguration.Configure(Action<_> Global.RegisterWebApi) 

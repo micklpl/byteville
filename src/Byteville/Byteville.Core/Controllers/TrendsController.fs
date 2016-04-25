@@ -8,13 +8,8 @@ open Newtonsoft.Json
 open Byteville.Core
 open Nest
 
-type TrendsController() =
+type TrendsController(client:ElasticClient) =
     inherit ApiController()
-
-    let GetElasticClient(index) = 
-        let node = new Uri("http://localhost:9200")
-        let settings = new ConnectionSettings(node)        
-        new ElasticClient(settings.DefaultIndex(index))
 
     let LastMonthFilter() =
         let monthAgo = DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd")
@@ -41,12 +36,11 @@ type TrendsController() =
         dictionary.Add("Description", container)
         new AggregationDictionary(dictionary)
 
-    member x.Get() : IHttpActionResult = 
-        let client = GetElasticClient("adverts")
-        let ftsController = new FtsController()  
+    member val Client = client with get,set
 
+    member x.Get() : IHttpActionResult = 
         let query = new SearchRequest()
         query.Query <- LastMonthFilter()
         query.Aggregations <- DescriptionAggregation()
 
-        client.Search<AdvertBase>(query).Aggregations |> x.Ok :> IHttpActionResult
+        x.Client.Search<AdvertBase>(query).Aggregations |> x.Ok :> IHttpActionResult
