@@ -169,6 +169,7 @@
     <Compile Include="Controllers\FtsController.fs" />
     <Compile Include="Controllers\TrendsController.fs" />
     <Compile Include="Controllers\RecommendationsController.fs" />
+    <Compile Include="Controllers\PrintController.fs" />
     <Content Include="Web.config" />
     <Compile Include="NLogger.fs" />
     <Compile Include="UnityResolver.fs" />
@@ -185,8 +186,30 @@
     </Content>
     <Content Include="app.js" />
     <Content Include="config.js" />
+    <None Include="edge\x86\node.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="edge\x86\edge_nativeclr.node">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="edge\x64\node.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="edge\x64\edge_nativeclr.node">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="edge\edge.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="edge\double_edge.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="EdgeJs">
+      <HintPath>..\packages\Edge.js.5.9.1\lib\EdgeJs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Elasticsearch.Net">
       <HintPath>..\packages\Elasticsearch.Net.2.0.5\lib\net45\Elasticsearch.Net.dll</HintPath>
       <Private>True</Private>
