@@ -204,6 +204,7 @@
     <Content Include="edge\double_edge.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="print.js" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="EdgeJs">
@@ -284,4 +285,8 @@
   <Target Name="BeforeBuild">
     <MSBuild.ExtensionPack.FileSystem.File TaskAction="Replace" RegexPattern="&lt;dependentAssembly&gt;([\s]+.)&lt;assemblyIdentity name=&quot;FSharp\.Core&quot; publicKeyToken=&quot;b03f5f7f11d50a3a&quot; culture=&quot;neutral&quot; \/&gt;([\s\S]+?)&lt;\/dependentAssembly&gt;" RegexOptionList="IgnoreCase|Singleline" Replacement="&lt;dependentAssembly&gt;&#xD;&#xA;        &lt;assemblyIdentity name=&quot;FSharp.Core&quot; publicKeyToken=&quot;b03f5f7f11d50a3a&quot; culture=&quot;neutral&quot; /&gt;&#xD;&#xA;        &lt;bindingRedirect oldVersion=&quot;0.0.0.0-$(TargetFSharpCoreVersion)&quot; newVersion=&quot;$(TargetFSharpCoreVersion)&quot;/&gt;&#xD;&#xA;      &lt;/dependentAssembly&gt;" Files="web.config" />
   </Target>
+  <PropertyGroup>
+    <PreBuildEvent>rem xcopy "$(ProjectDir)node_modules\*.*" "$(SolutionDir)Byteville.Core\bin\node_modules" /Y /I /E
+rem xcopy "$(ProjectDir)fonts\*.*" "C:\\Program Files (x86)\\IIS Express\\fonts" /Y /I /E</PreBuildEvent>
+  </PropertyGroup>
 </Project>

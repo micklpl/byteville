@@ -12,3 +12,4 @@ artifacts/
 src/Byteville/Byteville.Core/log
 src/DataStorage/
 src/Byteville/Byteville.Core/jspm_packages/
+src/Byteville/Byteville.Core/node_modules/
