@@ -148,6 +148,72 @@ type ClassifierTests() =
         let output = Byteville.TextMining.tryParseStreetFromDescription(text)
 
         test <@ output.Value.Name = expectedStreet @>
+
+    [<Fact>]
+    member x.Transform_Pages_To_Csv() =
+        let dir = "C:/mydir/Projekty/ByteVIlle/src/DataStorage/adverts/"
+        let adverts = new System.IO.DirectoryInfo(dir) |> fun di -> di.EnumerateFiles()
+                        |> Seq.map(fun file -> Byteville.TextMining.loadFileFromDisk(file.FullName))
+                        |> Seq.map(fun stream -> Byteville.TextMining.classifyAdvert(stream))
+                        |> Async.Parallel |> Async.RunSynchronously
+                        |> Seq.filter(fun ad -> ad.IsSome && ad.Value.District.IsSome)
+                        |> Seq.map(fun ad -> ad.Value)
+
+        let header = "area;nr_of_rooms;tier;parking;year_of_construction;district_id;price\n"
+
+        let tierMedian = adverts |> Seq.choose(fun a -> a.Tier)
+                                 |> Seq.sort|> List.ofSeq 
+                                 |> fun lst -> lst.[lst.Length /2]
+                                 |> System.Int32.Parse          
+
+        let nrOfRommsMedian = adverts |> Seq.choose(fun a -> a.NumberOfRooms)
+                                      |> Seq.sort|> List.ofSeq 
+                                      |> fun lst -> lst.[lst.Length /2] 
+
+        let yrOfConstMedian = adverts |> Seq.choose(fun a -> a.YearOfConstruction)
+                                      |> Seq.sort|> List.ofSeq 
+                                      |> fun lst -> lst.[lst.Length /2] 
+
+
+        let ppMAvg = adverts |> Seq.groupBy(fun a -> a.District.Value)
+                             |> Seq.map(fun t -> (fst(t), snd(t) 
+                                                    |> Seq.map(fun a -> a.PricePerMeter) 
+                                                    |> Seq.average))
+                             |> Seq.sortBy(fun t -> snd(t))
+                             |> Seq.map(fun t -> fst(t))
+                             |> List.ofSeq
+                            
+        let evaluateTier(a:Advert) = 
+            try
+                match a.Tier with
+                    | None ->  tierMedian
+                    | Some(x) -> match x with
+                                   | "parter" -> 0
+                                   | _ -> System.Int32.Parse(x)
+            with
+                | :? System.FormatException -> 0
+        
+        let adCsv = adverts 
+                    |> Seq.map(fun a -> {
+                                        a=a.Area;
+                                        n= if a.NumberOfRooms.IsSome then a.NumberOfRooms.Value else nrOfRommsMedian;
+                                        t= evaluateTier a;
+                                        p = if a.Parking.IsSome  then 1 else 0;
+                                        y = if a.YearOfConstruction.IsSome then a.YearOfConstruction.Value else yrOfConstMedian
+                                        l = ppMAvg |> List.findIndex(fun e -> e.Equals(a.District.Value));
+                                        tp = a.TotalPrice
+                                    })
+
+                    |> List.ofSeq
+                                                
+        let path = @"C:\mydir\Projekty\ByteVIlle\src\DataStorage\adverts.csv"
+        
+        use wr = new System.IO.StreamWriter(path)
+        wr.Write header
+        adCsv |> List.map(string) |> String.concat("") |> wr.Write
+        wr.Close()                                        
+
+        Assert.True(true)
         
 
 

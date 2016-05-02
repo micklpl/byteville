@@ -36,3 +36,8 @@ type Advert = {
 }
 
 exception IncorrectAdvert of string
+
+type advertCsv = {a:decimal<m^2>;n:int;t:int;p:int;y:int;l:int;tp:decimal<PLN>} 
+                   override this.ToString() = 
+                                sprintf "%f;%i;%i;%i;%i;%i;%f\n" 
+                                        this.a this.n this.t this.p this.y this.l this.tp
