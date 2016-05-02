@@ -66,6 +66,7 @@
     <Content Include="app.config" />
     <Compile Include="CrawlerTests.fs" />
     <Compile Include="TextMiningTests.fs" />
+    <Compile Include="MachineLearningTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

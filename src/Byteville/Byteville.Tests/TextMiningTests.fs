@@ -160,6 +160,7 @@ type ClassifierTests() =
                         |> Seq.map(fun ad -> ad.Value)
 
         let header = "area;nr_of_rooms;tier;parking;year_of_construction;district_id;price\n"
+        let header = "area;nr_of_rooms;district_id;price\n"
 
         let tierMedian = adverts |> Seq.choose(fun a -> a.Tier)
                                  |> Seq.sort|> List.ofSeq 
@@ -211,7 +212,7 @@ type ClassifierTests() =
         use wr = new System.IO.StreamWriter(path)
         wr.Write header
         adCsv |> List.map(string) |> String.concat("") |> wr.Write
-        wr.Close()                                        
+        wr.Close()                                     
 
         Assert.True(true)
         
