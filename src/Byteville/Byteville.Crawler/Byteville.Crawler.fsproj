@@ -73,6 +73,14 @@
       <HintPath>..\packages\Accord.3.0.2\lib\net45\Accord.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Accord.MachineLearning">
+      <HintPath>..\packages\Accord.MachineLearning.3.0.2\lib\net45\Accord.MachineLearning.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Accord.MachineLearning.GPL">
+      <HintPath>..\packages\Accord.MachineLearning.GPL.3.0.2\lib\net45\Accord.MachineLearning.GPL.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Accord.Math">
       <HintPath>..\packages\Accord.Math.3.0.2\lib\net45\Accord.Math.dll</HintPath>
       <Private>True</Private>
