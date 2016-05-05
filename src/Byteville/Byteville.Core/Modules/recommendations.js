@@ -25,9 +25,30 @@ export class Recommendations{
         var client = new HttpClient();
         let self = this;
         let q = `?lat=${this.lat}&lon=${this.lon}&price=${this.price}&area=${this.area}`
-        client.get("api/recommendations" + q).then( res => {
-            self.results = JSON.parse(res.response);
-        })
+        client.get("api/recommendations" + q).then( res => {}, err => {
+            if(err.statusCode === 412){
+                let message = err.response;
+                let i = 0;
+                let candidate = "";
+
+                while(true){
+                    candidate = message + "#" + i++;;
+                    let hashBits = window.sjcl.hash.sha256.hash(candidate);
+                    let hashStr = sjcl.codec.hex.fromBits(hashBits);
+                    if(hashStr.indexOf("0000") === 0){                        
+                        break;
+                    }
+                }
+
+                var client2 = new HttpClient().configure(x => {
+                                  x.withHeader('X-Proof-Of-Work', candidate);
+                              });
+
+                client2.get("api/recommendations" + q).then( resp => {
+                    self.results = JSON.parse(resp.response);
+                });
+            }
+        });
     }
 }
 

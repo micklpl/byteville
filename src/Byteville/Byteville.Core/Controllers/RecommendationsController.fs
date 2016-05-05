@@ -77,6 +77,7 @@ type RecommendationsController(client:ElasticClient) =
 
     member val Client = client with get,set
 
+    [<ProofOfWorkFilter>]
     member x.Get([<FromUri>]query:RecommendationsQueryModel) = 
         let req = new SearchRequest()
 

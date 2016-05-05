@@ -162,6 +162,7 @@
     <Compile Include="Models\Advert.fs" />
     <Compile Include="DataLoader.fs" />
     <Compile Include="MemoryCacheFilterAttribute.fs" />
+    <Compile Include="ProofOfWorkFilterAttribute.fs" />
     <Compile Include="Controllers\AggregationsController.fs" />
     <Compile Include="Controllers\DistrictsController.fs" />
     <Compile Include="Controllers\ItemsController.fs" />
