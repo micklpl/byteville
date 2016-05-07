@@ -1,0 +1,17 @@
+﻿<template bindable="selectedOptions">
+    <div class="dropdown">
+        <button id="dropdownMenu3" type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+            <span class.bind="selectedOptions !== '' ? 'has-value': ''">
+                ${selectedOptions !== '' ? selectionText() : "Dodatkowe opcje"}
+            </span>
+            <span class="caret"></span>
+        </button>
+        <ul id="optionsMenu" class="dropdown-menu" aria-labelledby="dropdownMenu3">
+            <li repeat.for="option of options">
+                <a click.delegate="toggleSelection(option.key)" href="#" class="district-filter">
+                    <input type="checkbox" checked.one-way="option.checked" />&nbsp; ${option.value}
+                </a>
+            </li>         
+        </ul>
+    </div>
+</template>

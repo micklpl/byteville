@@ -4,6 +4,7 @@
     <require from="./Helpers/date-from-now"></require>
     <require from="./Controls/districts-filter"></require>
     <require from="./Controls/timespan-filter"></require>
+    <require from="./Controls/options-list"></require>
     <div class="trends">
         <h2>Trendy</h2>
         <ul repeat.for="trend of trends">
@@ -17,6 +18,7 @@
         <div class="btn-group">
             <districts-filter selected-district.bind="params.district" change.delegate="filterChanged()"></districts-filter>
             <timespan-filter selected-span.bind="params.timespan" change.delegate="filterChanged()"></timespan-filter>
+            <options-list selected-options.bind="params.options" change.delegate="filterChanged()"></options-list>
         </div>       
     </div>
     <div class="container">

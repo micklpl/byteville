@@ -6,7 +6,8 @@ export class AdvertsList{
         this.params = {
             q: "", 
             district: "",
-            timespan: ""
+            timespan: "",
+            options: ""
         };
         this.observerLocator = new ObserverLocator(); 
     }
@@ -42,6 +43,9 @@ export class AdvertsList{
 
             if(!!params.timespan)
                 url = this.appendQueryParam(url, "dateFrom", params.timespan);
+            
+            if(!!params.options)
+                url = this.appendQueryParam(url, "positiveFields", params.options);
         }        
 
         client.get(url).then( response => {
