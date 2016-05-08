@@ -7,7 +7,11 @@ export class AdvertsList{
             q: "", 
             district: "",
             timespan: "",
-            options: ""
+            options: "",
+            priceFrom: "",
+            priceTo: "",
+            areaFrom: "",
+            areaTo: ""
         };
         this.observerLocator = new ObserverLocator(); 
     }
@@ -46,6 +50,18 @@ export class AdvertsList{
             
             if(!!params.options)
                 url = this.appendQueryParam(url, "positiveFields", params.options);
+
+            if(!!params.areaFrom)
+                url = this.tryAppendNumericParam(url, "areaFrom", params.areaFrom);
+
+            if(!!params.areaTo)
+                url = this.tryAppendNumericParam(url, "areaTo", params.areaTo);
+
+            if(!!params.priceFrom)
+                url = this.tryAppendNumericParam(url, "priceFrom", params.priceFrom);
+
+            if(!!params.priceTo)
+                url = this.tryAppendNumericParam(url, "priceTo", params.priceTo);
         }        
 
         client.get(url).then( response => {
@@ -56,6 +72,16 @@ export class AdvertsList{
     appendQueryParam(url, name, value){
         let pair = name + "=" + value;
         return url.lastIndexOf("?") !== -1 ? url + "&" + pair : url + "?" + pair;
+    }
+
+    tryAppendNumericParam(url, name, value){
+        let valueInt = parseInt(value.replace(" ", ""));
+        if(!isNaN(valueInt)){
+            return this.appendQueryParam(url, name, valueInt);
+        }
+        else{
+            return url;
+        }
     }
 
     filterChanged(){

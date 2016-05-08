@@ -19,6 +19,25 @@
             <districts-filter selected-district.bind="params.district" change.delegate="filterChanged()"></districts-filter>
             <timespan-filter selected-span.bind="params.timespan" change.delegate="filterChanged()"></timespan-filter>
             <options-list selected-options.bind="params.options" change.delegate="filterChanged()"></options-list>
+            <div class="filter-group dropdown inactive-label">                
+                <div class.bind="params.priceFrom !== '' || params.priceTo !== '' ? 'has-value': ''">
+                    <div class="filter-group-title">Cena</div>
+                    <input class="reset num-filter" value.bind="params.priceFrom" change.delegate="filterChanged()" type="text" placeholder="Od" />
+                    <span>-</span>
+                    <input class="reset num-filter" value.bind="params.priceTo" change.delegate="filterChanged()" type="text" placeholder="Do" />
+                    <span>PLN</span>
+                </div>                
+            </div>
+            <div class="filter-group dropdown inactive-label">
+                <div class.bind="params.areaFrom !== '' || params.areaTo !== '' ? 'has-value': ''">
+                    <div class="filter-group-title">Powierzchnia</div>
+                    <input class="reset num-filter" value.bind="params.areaFrom" change.delegate="filterChanged()" type="text" placeholder="Od" pattern="[0-9]{2,3}" />
+                    <span>-</span>
+                    <input class="reset num-filter" value.bind="params.areaTo" change.delegate="filterChanged()" type="text" placeholder="Do" pattern="[0-9]{2,3}" />
+                    <span>m</span>
+                    <sup>2</sup>
+                </div>
+            </div>            
         </div>       
     </div>
     <div class="container">

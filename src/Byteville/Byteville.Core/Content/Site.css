@@ -310,3 +310,35 @@
 .dropdown{
     display: inherit;
 }
+
+.filter-group-title{
+    margin-left: 20px;
+    margin-right: 20px;
+    line-height: 50px;
+    display: inline-block;
+}
+
+.filter-group{
+    border: 2px solid #ccc;
+    height: 50px;
+    display: inline-block;
+    vertical-align: middle;
+    padding-right: 20px;
+}
+
+.num-filter{
+    width: 100px;
+    height: 40px;
+    line-height: 50px;
+    font-size: 14px;
+    background-color: #F3E6E8;
+    border: 0px;
+}
+
+.num-filter:active{
+    border: 0px;
+}
+
+.inactive-label{
+    color: #C5B6B8;
+}

@@ -15,6 +15,8 @@ type FtsQueryModel() =
     member val dateFrom:string = null with get, set
     member val priceFrom = defaultof<float> with get, set
     member val priceTo = defaultof<float> with get, set
+    member val areaFrom = defaultof<float> with get, set
+    member val areaTo = defaultof<float> with get, set
     member val pricePerMeterFrom = defaultof<float> with get, set
     member val pricePerMeterTo = defaultof<float> with get, set
     member val district:string = null with get,set
@@ -113,17 +115,18 @@ type FtsController(client:ElasticClient) =
 
         CreateRangeQueries(model.priceFrom, model.priceTo, "TotalPrice") |> filters.AddRange
         CreateRangeQueries(model.pricePerMeterFrom, model.pricePerMeterTo, "PricePerMeter") |> filters.AddRange
+        CreateRangeQueries(model.areaFrom, model.areaTo, "Area") |> filters.AddRange
 
-        if not(model.dateFrom = null) then
+        if model.dateFrom <> null then
             CreateDatesRangeFilter(model.dateFrom, "CreationDate") |> filters.Add
 
-        if not(model.positiveFields = null) then
+        if model.positiveFields <> null then
             CreateBooleanQueries(model.positiveFields, true) |> filters.AddRange
 
-        if not(model.negativeFields = null) then
+        if model.negativeFields <> null then
             CreateBooleanQueries(model.negativeFields, false) |> filters.AddRange
 
-        if not(model.q = null) then
+        if model.q <> null then
             CreateMultiMatchQuery(model.q) |> filters.AddRange
 
         boolQuery.Must <- filters        
