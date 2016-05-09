@@ -24,4 +24,14 @@ describe('adverts list', function() {
             });
         });
     });
+
+    it('should navigate to recommendations page', function(){
+        var link = element(by.css('a[href*="#recommendations"]'));
+        link.click();
+
+        browser.sleep(200);
+
+        browser.getCurrentUrl().then(url => expect(url).toBe('http://localhost:48213/#recommendations'));
+    });
+
 });
