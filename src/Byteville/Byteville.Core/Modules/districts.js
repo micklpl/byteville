@@ -3,7 +3,7 @@
 export class Districts{
     constructor(){
         this.options = [
-            {name: "Liczba ogloszen"},
+            {name: "Liczba ogłoszeń"},
             {field:"TotalPrice", name:"Cena"},
             {field:"PricePerMeter", name:"Cena za metr"},
             {field:"Area", name:"Powierzchnia"},
@@ -59,6 +59,8 @@ export class Districts{
 
             let aggregationsData = response.map(item => {
                 let stats = item.aggregations.inner_aggregation;
+                if(stats.count === 0) return undefined;
+                
                 return{
                     key: item.key,
                     avg: stats.average.toFixed(2),
@@ -66,6 +68,8 @@ export class Districts{
                     max: stats.max.toFixed(2)
                 }
             });
+
+            aggregationsData = aggregationsData.filter(item => item !== undefined);
 
             document.querySelector('#aggs').setAttribute("aggregations", JSON.stringify(aggregationsData));
         })
@@ -91,6 +95,20 @@ export class Districts{
     leaveDistrict($event){
         $event.srcElement.classList.remove("pulsar-animation");
         this.selectedItem = undefined;
+    }
+
+    optionToTitle(selectedOption){
+        if(selectedOption === undefined) return "Liczba ogłoszeń";
+        let elem = this.options.filter(option => option.field === selectedOption)[0]; 
+        return elem.name;
+    }
+
+    aggOptionClass(option){
+        if(!this.selectedOption && option === "Liczba ogłoszeń")
+            return "agg-option selected-agg-option";
+        if(this.selectedOption === option)
+            return "agg-option selected-agg-option";
+        return "agg-option";
     }
 
 }

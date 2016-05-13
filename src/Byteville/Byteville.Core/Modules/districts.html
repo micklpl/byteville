@@ -3,11 +3,13 @@
         <div id="mapNavbar">
             <div id="mapNavbarPanel">
                 <ul repeat.for="option of options">
-                    <li click.delegate="executeAggregation(option.field)">${option.name}</li>
+                    <li class.bind="selectedOption === option.field ? 'selected-agg-option' : 'agg-option'" click.delegate="executeAggregation(option.field)">
+                        ${option.name}
+                    </li>
                 </ul>
             </div>
-            <aggregation-results id="aggs" if.bind="aggregationsData !== undefined">
-                <h2>${selectedOption}</h2>
+            <aggregation-results id="aggs" if.bind="aggregationsData !== undefined && selectedOption !== undefined">
+                <h2>${optionToTitle(selectedOption)}</h2>
             </aggregation-results>
         </div>
         <div id="mapContent">

@@ -117,7 +117,7 @@
   height: 150%;
   background-color: #F3E6E8;
   color: #A23645;
-  padding: 30px 20px;
+  padding: 30px 20px 30px 5px;
   width: 250px;
   border: 2px solid #60000D;
 }
@@ -341,4 +341,18 @@
 
 .inactive-label{
     color: #C5B6B8;
+}
+
+.agg-option{
+    border-left-style: solid;
+    border-left-width: 10px;
+    border-left-color: #F3E6E8;
+    padding-left: 5px;
+}
+
+.selected-agg-option{
+    border-left-color: #7F0011;
+    border-left-style: solid;
+    border-left-width: 10px;
+    padding-left: 5px;
 }
