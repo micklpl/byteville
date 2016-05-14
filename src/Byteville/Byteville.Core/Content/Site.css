@@ -191,6 +191,7 @@
 
 .ad-geo{
   margin-bottom: 20px;
+  padding-right: 20px;
   color: #A23645;
 }
 
@@ -359,4 +360,13 @@
 
 h2.selected-district-info{
     height: 40px;
+}
+
+.nav-icon{
+    float: right;
+}
+
+.nav-icon img{
+    width: 32px;
+    height: 32px;
 }

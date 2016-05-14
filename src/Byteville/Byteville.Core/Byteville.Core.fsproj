@@ -110,6 +110,8 @@
   </ProjectExtensions>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <None Include="Content\site.png" />
+    <None Include="Content\pdf.png" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.css.map" />

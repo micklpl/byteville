@@ -55,7 +55,19 @@
                 </div>
                 <div class="ad-geo">
                     <span class="ad-district">${advert.district}</span>,
-                    <span class="ad-street"><a href="/#streets/${advert.street}">${advert.street}</a></span>
+                    <span class="ad-street">
+                        <a href="/#streets/${advert.street}">${advert.street}</a>
+                    </span>
+                    <span class="nav-icon">
+                        <a href="${advert.url}" target="_blank">
+                            <img src="../Content/site.png" />
+                        </a>
+                    </span>
+                    <span class="nav-icon">
+                        <a href="/api/print?md5=${advert.md5}" target="_blank">
+                            <img src="../Content/pdf.png" />
+                        </a>
+                    </span>
                 </div>
             </div>
         </div>

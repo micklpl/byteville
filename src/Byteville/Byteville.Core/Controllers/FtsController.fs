@@ -34,7 +34,8 @@ type AdvertMetadata =
         District: string;
         Title : string;
         Md5: string;
-        CreationDate: DateTime
+        CreationDate: DateTime;
+        Url: string
     }
 
 type FilterInequality =
