@@ -356,3 +356,7 @@
     border-left-width: 10px;
     padding-left: 5px;
 }
+
+h2.selected-district-info{
+    height: 40px;
+}

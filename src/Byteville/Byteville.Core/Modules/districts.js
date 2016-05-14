@@ -17,6 +17,7 @@ export class Districts{
         this.details = undefined;
         this.selectedOption = undefined;
         this.aggregationsData = [];
+        this.selectedItemInfo = " ";
 
         var self = this;
         self.countItems(self);        
@@ -71,6 +72,10 @@ export class Districts{
 
             aggregationsData = aggregationsData.filter(item => item !== undefined);
 
+            aggregationsData.forEach(item =>{
+                self.data[item.key] = item.avg;
+            });
+
             document.querySelector('#aggs').setAttribute("aggregations", JSON.stringify(aggregationsData));
         })
     }
@@ -90,25 +95,22 @@ export class Districts{
     selectDistrict($event){
         $event.srcElement.classList.add("pulsar-animation");
         this.selectedItem  = $event.srcElement.id;
+        var districtId = $event.srcElement.id;
+        console.log(districtId);
+        this.selectedItemInfo = districtId;
+        this.selectedItemInfo += ": " + this.data[districtId];
     }
 
     leaveDistrict($event){
         $event.srcElement.classList.remove("pulsar-animation");
         this.selectedItem = undefined;
+        this.selectedItemInfo = "";
     }
 
     optionToTitle(selectedOption){
         if(selectedOption === undefined) return "Liczba ogłoszeń";
         let elem = this.options.filter(option => option.field === selectedOption)[0]; 
         return elem.name;
-    }
-
-    aggOptionClass(option){
-        if(!this.selectedOption && option === "Liczba ogłoszeń")
-            return "agg-option selected-agg-option";
-        if(this.selectedOption === option)
-            return "agg-option selected-agg-option";
-        return "agg-option";
     }
 
 }
