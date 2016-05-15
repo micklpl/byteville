@@ -10,11 +10,18 @@
             <input type="text" placeholder="Adres, nazwa miejsca" value.bind="placeDesc" />
             <input type="button" value="Wyszukaj" class="bv-btn" click.delegate="geocode()" />            
         </span>
-        <span if.bind="address !== undefined">${address} (${lat}, ${lon})</span>
+        <span if.bind="address !== undefined">
+            <span>${address} (${lat}, ${lon})</span>
+            <input type="button" value="Resetuj" class="bv-btn" click.delegate="reset()" />
+        </span>
         <h4>II. Cena [PLN]</h4>
         <input type="text" value.bind="price" />
         <h4>III. Powierzchnia [m<sup>2</sup>]</h4>
         <input type="text" value.bind="area" />
+        <div class="remember-chkbox">
+            <label for="chkbox1">Zapamiętaj</label>
+            <input id="chkbox1" type="checkbox" checked.bind="remember" /> 
+        </div>        
         <div>
             <input type="button" value="Wyświetl propozycje" class="bv-btn rec-btn" click.delegate="getRecommendations()" />
         </div>

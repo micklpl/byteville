@@ -3,7 +3,9 @@
         <div id="googleMap" style="width:1024px;height:768px;"></div>
         <div if.bind="timeToWork === undefined">
             <input class="my-place" type="text" placeholder="Wpisz nazwę szkoły / firmy" value.bind="myPlace" />
-            <input class="my-place-btn" type="button" value="Znajdź drogę" click.delegate="getRoute()" />            
+            <label for="chkbox1">Zapamiętaj</label>
+            <input id="chkbox1" type="checkbox" checked.bind="remember" />  
+            <input class="my-place-btn" type="button" value="Znajdź drogę" click.delegate="getRoute()" />                     
         </div>
         <div if.bind="timeToWork !== undefined" class="distance-result">
             Szacowany czas dojazdu samochodem wynosi: <B>${timeToWork}</B> (${kilometers})

@@ -8,7 +8,9 @@ export class Streets{
     }
     
     activate(params){
-        this.name = params.name + ",Kraków";        
+        this.name = params.name + ", Kraków";        
+        this.remember = false;
+        this.myPlace = localStorage.getItem("myPlace") || "";
     }
 
     findPlaces(coords){
@@ -52,6 +54,9 @@ export class Streets{
 
     getRoute(){
         let self = this;
+        if(self.remember){
+            localStorage.setItem("myPlace", self.myPlace);
+        }
 
         this.geocode(this.myPlace, (res, status) => {
             let placeCoordinates = res[0].geometry.location;

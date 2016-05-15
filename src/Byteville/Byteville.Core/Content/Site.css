@@ -264,7 +264,7 @@
 .my-place{
     width: 200px;
     height: 30px;
-    margin-right: 50px;
+    margin-right: 10px;
     background-color: #F3E6E8;
     color: #7F0011;
 }
@@ -408,4 +408,14 @@ h2.selected-district-info{
 
 path{
     cursor: pointer;
+}
+
+#chkbox1{
+    width: 18px;
+    height: 18px;
+    margin-right: 25px;
+}
+
+.remember-chkbox{
+    margin-top: 15px;
 }

@@ -5,9 +5,19 @@ export class Recommendations{
 
     constructor(){
         this.waitingForResults = false;
+        this.remember = false;
+        let preferences = localStorage.getItem('userPreferences');
+        preferences = !!preferences ? JSON.parse(preferences) : {};
+
+        this.area = preferences.area;
+        this.price = preferences.price;
+        this.address = preferences.address;
+        this.lat = preferences.lat;
+        this.lon = preferences.lon;
     }
-    
-    activate(){
+
+    tryGetFromLocalStorage(key){
+        return localStorage.getItem(key) || "";
     }
 
     geocode(name, cb){
@@ -21,7 +31,23 @@ export class Recommendations{
         });
     }
 
+    storeIfSelected(){
+        if(this.remember){
+            let obj = {
+                area : this.area,
+                address: this.address,
+                price: this.price,
+                lat: this.lat,
+                lon: this.lon
+            };
+
+            localStorage.setItem('userPreferences', JSON.stringify(obj));
+        }
+    }
+
     getRecommendations(){
+        this.storeIfSelected();
+
         var client = new HttpClient();
         let self = this;
         let q = `?lat=${this.lat}&lon=${this.lon}&price=${this.price}&area=${this.area}`;
@@ -51,6 +77,12 @@ export class Recommendations{
                 });
             }
         });
+    }
+
+    reset(){
+        this.address = undefined;
+        this.lat = undefined;
+        this.lon = undefined;
     }
 }
 
