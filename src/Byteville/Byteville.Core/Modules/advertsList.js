@@ -21,10 +21,15 @@ export class AdvertsList{
         };
     }
     
-    activate(){        
+    activate(params){        
         var self = this;
+
+        if(params.district){
+            self.params.district = params.district;
+        }
+
         var client = new HttpClient();
-        this.search();
+        this.search(this.params);
 
         client.get("api/trends/").then( payload => {
             self.trends = JSON.parse(payload.response).description.items;

@@ -405,3 +405,7 @@ h2.selected-district-info{
     opacity: 0.4;
     cursor: pointer;
 }
+
+path{
+    cursor: pointer;
+}

@@ -1,7 +1,11 @@
-﻿import {HttpClient} from "aurelia-http-client"
+﻿import {HttpClient} from "aurelia-http-client";
+import {Router} from 'aurelia-router';
 
 export class Districts{
-    constructor(){
+
+    static inject() { return [Router]; }
+
+    constructor(router){
         this.options = [
             {name: "Liczba ogłoszeń"},
             {field:"TotalPrice", name:"Cena", aggregation: true, unit: "zł"},
@@ -15,6 +19,7 @@ export class Districts{
         ];
 
         this.waitingForResults = false;
+        this.router = router;
     }
     
     activate(){        
@@ -26,7 +31,7 @@ export class Districts{
 
         var self = this;
         this.waitingForResults = true;
-        self.countItems(self);        
+        self.countItems(self);
     }
 
     countItems(self){
@@ -174,4 +179,7 @@ export class Districts{
         return elem.name;
     }
 
+    redirectTo(district){
+        this.router.navigate('advertsList/'+ district);
+    }
 }

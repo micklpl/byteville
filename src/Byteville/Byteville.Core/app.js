@@ -4,7 +4,7 @@
         config.title = 'Byteville - find your estate';
         config.map([
           { 
-              route: ['','advertsList'], 
+              route: ['','advertsList/:district'], 
               name: 'advertsList', 
               moduleId: './Modules/advertsList', 
               nav: true, title:'Lista ogłoszeń' 
