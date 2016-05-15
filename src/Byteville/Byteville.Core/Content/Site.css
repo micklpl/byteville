@@ -399,3 +399,9 @@ h2.selected-district-info{
       opacity: 0;
     }
 }
+
+.btn-group > img{
+    margin-left: 5px;
+    opacity: 0.4;
+    cursor: pointer;
+}

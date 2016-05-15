@@ -16,6 +16,7 @@
             <input autofocus type="text" placeholder="Czego szukasz ?" value.bind="params.q & throttle:500" />
         </div>
         <div class="btn-group">
+            <img src="../Content/refresh-arrow.svg" width="35" height="35" click.delegate="resetFilters()" />
             <districts-filter selected-district.bind="params.district" change.delegate="filterChanged()"></districts-filter>
             <timespan-filter selected-span.bind="params.timespan" change.delegate="filterChanged()"></timespan-filter>
             <options-list selected-options.bind="params.options" change.delegate="filterChanged()"></options-list>

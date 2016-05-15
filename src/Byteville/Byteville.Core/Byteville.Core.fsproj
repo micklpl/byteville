@@ -110,6 +110,7 @@
   </ProjectExtensions>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Content Include="Content\refresh-arrow.svg" />
     <None Include="Content\site.png" />
     <None Include="Content\pdf.png" />
     <Content Include="Content\Site.css" />
@@ -162,6 +163,7 @@
     <Content Include="Items\streets.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Items\districts.csv" />
     <Compile Include="Models\Car.fs" />
     <Compile Include="Models\Advert.fs" />
     <Compile Include="DataLoader.fs" />
@@ -186,7 +188,6 @@
     <Content Include="Index.html" />
     <Content Include="packages.config" />
     <Content Include="readme.txt" />
-    <EmbeddedResource Include="Items\districts.csv" />
     <None Include="NLog.xsd" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

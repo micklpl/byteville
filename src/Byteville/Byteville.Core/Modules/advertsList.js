@@ -3,7 +3,13 @@ import {ObserverLocator} from 'aurelia-framework';
 
 export class AdvertsList{
     constructor(){        
-        this.params = {
+        this.params = this.defaultParams();
+        this.observerLocator = new ObserverLocator();
+        this.waitingForResults = false;
+    }
+
+    defaultParams(){
+        return {
             q: "", 
             district: "",
             timespan: "",
@@ -13,8 +19,6 @@ export class AdvertsList{
             areaFrom: "",
             areaTo: ""
         };
-        this.observerLocator = new ObserverLocator();
-        this.waitingForResults = false;
     }
     
     activate(){        
@@ -97,6 +101,14 @@ export class AdvertsList{
     setInput(value){
         this.params.q = value;
         filterChanged();
+    }
+
+    resetFilters(){
+        let self = this;
+        this.params = this.defaultParams();
+        setTimeout(function(){
+            self.search(self.params);
+        }, 200);
     }
 }
 
