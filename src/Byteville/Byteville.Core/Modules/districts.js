@@ -4,11 +4,14 @@ export class Districts{
     constructor(){
         this.options = [
             {name: "Liczba ogłoszeń"},
-            {field:"TotalPrice", name:"Cena"},
-            {field:"PricePerMeter", name:"Cena za metr"},
-            {field:"Area", name:"Powierzchnia"},
-            {field:"NumberOfRooms", name:"Liczba pokoi"},
-            {field:"YearOfConstruction", name:"Rok budowy"}            
+            {field:"TotalPrice", name:"Cena", aggregation: true, unit: "zł"},
+            {field:"PricePerMeter", name:"Cena za metr", aggregation: true, unit: "zł/m2"},
+            {field:"Area", name:"Powierzchnia", aggregation: true, unit: "m2"},
+            {field:"NumberOfRooms", name:"Liczba pokoi", aggregation: true},
+            {field:"YearOfConstruction", name:"Rok budowy", aggregation: true},
+            {field:"powierzchnia", name:"Obszar [ha]", aggregation: false, unit: "ha"},
+            {field:"liczba_mieszkancow", name:"Liczba mieszkańców", aggregation: false},
+            {field:"zageszczenie_ludnosci", name:"Zagęszczenie ludności", aggregation: false, unit: "osób/km2"}
         ];
     }
     
@@ -80,15 +83,55 @@ export class Districts{
         })
     }
 
-    executeAggregation(field){
+    districtStats(self, field){
+        var client = new HttpClient();
+        self.data = {};
+        client.get("api/districtstats?id=" + field).then( response => {
+            var response = JSON.parse(response.response);
+            self.data = JSON.parse(response);
+
+            let items = [];
+            for(var key in self.data){
+                let value = self.data[key].replace(",",".").replace(" ", "");
+
+                items.push({
+                    key: key, 
+                    value: parseFloat(value)
+                });
+            }
+
+            items = items.sort((item1, item2) => {
+                let v1 = item1.value;
+                let v2 = item2.value;
+                if(v1 === v2)
+                    return 0;
+                if(v1 < v2)
+                    return 1;
+                return -1;
+            });
+
+            for(var i = 0; i < items.length; i++){
+                let name = items[i].key;
+                let element = document.getElementById(name);
+                element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
+            }
+
+            self.aggregationsData = undefined;
+        })
+    }
+
+    fetchData(field, aggregation){
         var self = this;
         this.selectedOption = field;
 
-        if(field){
+        if(!field){
+            self.countItems(self);
+        }
+        else if(aggregation){            
             self.statsAggregation(self, field);
         }
         else{
-            self.countItems(self);
+            self.districtStats(self, field);
         }
     }
 
@@ -96,9 +139,12 @@ export class Districts{
         $event.srcElement.classList.add("pulsar-animation");
         this.selectedItem  = $event.srcElement.id;
         var districtId = $event.srcElement.id;
-        console.log(districtId);
         this.selectedItemInfo = districtId;
         this.selectedItemInfo += ": " + this.data[districtId];
+
+        if(this.selectedOption){
+            this.selectedItemInfo += " " + (this.options.filter(opt => opt.field === this.selectedOption)[0].unit || "");
+        }
     }
 
     leaveDistrict($event){

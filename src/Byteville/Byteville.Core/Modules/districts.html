@@ -3,7 +3,7 @@
         <div id="mapNavbar">
             <div id="mapNavbarPanel">
                 <ul repeat.for="option of options">
-                    <li class.bind="selectedOption === option.field ? 'selected-agg-option' : 'agg-option'" click.delegate="executeAggregation(option.field)">
+                    <li class.bind="selectedOption === option.field ? 'selected-agg-option' : 'agg-option'" click.delegate="fetchData(option.field, option.aggregation)">
                         ${option.name}
                     </li>
                 </ul>

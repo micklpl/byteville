@@ -175,6 +175,7 @@
     <Compile Include="Controllers\TrendsController.fs" />
     <Compile Include="Controllers\RecommendationsController.fs" />
     <Compile Include="Controllers\PrintController.fs" />
+    <Compile Include="Controllers\DistrictStatsController.fs" />
     <Content Include="Web.config" />
     <Compile Include="NLogger.fs" />
     <Compile Include="UnityResolver.fs" />
@@ -185,6 +186,7 @@
     <Content Include="Index.html" />
     <Content Include="packages.config" />
     <Content Include="readme.txt" />
+    <EmbeddedResource Include="Items\districts.csv" />
     <None Include="NLog.xsd" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -35,6 +35,16 @@
                 <div class="ad-geo">
                     <span class="ad-district">${advert.advertMetadata.district}</span>,
                     <span class="ad-street"><a href="/#streets/${advert.advertMetadata.street}">${advert.advertMetadata.street}</a></span>
+                    <span class="nav-icon">
+                        <a href="${advert.advertMetadata.url}" target="_blank">
+                            <img src="../Content/site.png" />
+                        </a>
+                    </span>
+                    <span class="nav-icon">
+                        <a href="/api/print?md5=${advert.advertMetadata.md5}" target="_blank">
+                            <img src="../Content/pdf.png" />
+                        </a>
+                    </span>
                 </div>
             </div>
         </div>
