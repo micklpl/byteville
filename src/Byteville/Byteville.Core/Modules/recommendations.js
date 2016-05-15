@@ -4,7 +4,7 @@ export class Recommendations{
     placeDesc = ""
 
     constructor(){
-
+        this.waitingForResults = false;
     }
     
     activate(){
@@ -24,7 +24,8 @@ export class Recommendations{
     getRecommendations(){
         var client = new HttpClient();
         let self = this;
-        let q = `?lat=${this.lat}&lon=${this.lon}&price=${this.price}&area=${this.area}`
+        let q = `?lat=${this.lat}&lon=${this.lon}&price=${this.price}&area=${this.area}`;
+        this.waitingForResults = true;
         client.get("api/recommendations" + q).then( res => {}, err => {
             if(err.statusCode === 412){
                 let message = err.response;
@@ -46,6 +47,7 @@ export class Recommendations{
 
                 client2.get("api/recommendations" + q).then( resp => {
                     self.results = JSON.parse(resp.response);
+                    self.waitingForResults = false;
                 });
             }
         });

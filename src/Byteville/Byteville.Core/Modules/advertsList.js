@@ -13,7 +13,8 @@ export class AdvertsList{
             areaFrom: "",
             areaTo: ""
         };
-        this.observerLocator = new ObserverLocator(); 
+        this.observerLocator = new ObserverLocator();
+        this.waitingForResults = false;
     }
     
     activate(){        
@@ -64,8 +65,10 @@ export class AdvertsList{
                 url = this.tryAppendNumericParam(url, "priceTo", params.priceTo);
         }        
 
+        self.waitingForResults = true;
         client.get(url).then( response => {
             self.adverts = response.content;
+            self.waitingForResults = false;
         })
     }
 

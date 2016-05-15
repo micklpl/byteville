@@ -13,6 +13,8 @@ export class Districts{
             {field:"liczba_mieszkancow", name:"Liczba mieszkańców", aggregation: false},
             {field:"zageszczenie_ludnosci", name:"Zagęszczenie ludności", aggregation: false, unit: "osób/km2"}
         ];
+
+        this.waitingForResults = false;
     }
     
     activate(){        
@@ -23,6 +25,7 @@ export class Districts{
         this.selectedItemInfo = " ";
 
         var self = this;
+        this.waitingForResults = true;
         self.countItems(self);        
     }
 
@@ -30,21 +33,26 @@ export class Districts{
         var client = new HttpClient();
         client.get("api/aggregations/District").then( response => {
             var response = JSON.parse(response.response);
-            for(var i = 0; i < response.length; i++){
-                var name = response[i].key;
-                var element = document.getElementById(name);
-                element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
-                self.data[name] = response[i].docCount;
-                self.aggregationsData = [];
-            }
+            self.waitingForResults = false;
+            setTimeout(function(){
+                for(var i = 0; i < response.length; i++){
+                    var name = response[i].key;                
+                    var element = document.getElementById(name);
+                    element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
+                    self.data[name] = response[i].docCount;
+                    self.aggregationsData = [];                
+                }
+            }, 100);            
         })
     }
 
     statsAggregation(self, field){
         var client = new HttpClient();
         self.data = {};
+        self.waitingForResults = true;
         client.get("api/aggregations/District?statsField=" + field).then( response => {
             var response = JSON.parse(response.response);
+            self.waitingForResults = false;
             response = response.sort((item1, item2) => {
                 let avg1 = item1.aggregations.inner_aggregation.average;
                 let avg2 = item2.aggregations.inner_aggregation.average;
@@ -55,11 +63,13 @@ export class Districts{
                 return -1;
             });
 
-            for(var i = 0; i < response.length; i++){
-                let name = response[i].key;
-                let element = document.getElementById(name);
-                element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
-            }
+            setTimeout(function(){
+                for(var i = 0; i < response.length; i++){
+                    let name = response[i].key;
+                    let element = document.getElementById(name);
+                    element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
+                }
+            }, 100);            
 
             let aggregationsData = response.map(item => {
                 let stats = item.aggregations.inner_aggregation;
@@ -79,16 +89,18 @@ export class Districts{
                 self.data[item.key] = item.avg;
             });
 
-            document.querySelector('#aggs').setAttribute("aggregations", JSON.stringify(aggregationsData));
+            document.querySelector('#aggs').setAttribute("aggregations", JSON.stringify(aggregationsData));            
         })
     }
 
     districtStats(self, field){
         var client = new HttpClient();
         self.data = {};
+        self.waitingForResults = true;
         client.get("api/districtstats?id=" + field).then( response => {
             var response = JSON.parse(response.response);
             self.data = JSON.parse(response);
+            self.waitingForResults = false;
 
             let items = [];
             for(var key in self.data){
@@ -110,13 +122,16 @@ export class Districts{
                 return -1;
             });
 
-            for(var i = 0; i < items.length; i++){
-                let name = items[i].key;
-                let element = document.getElementById(name);
-                element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
-            }
+            setTimeout(function(){
+                for(var i = 0; i < items.length; i++){
+                    let name = items[i].key;
+                    let element = document.getElementById(name);
+                    element.setAttribute("fill", `hsl(${8*i}, 100%, 50%)`);
+                }
+            }, 100);
+            
 
-            self.aggregationsData = undefined;
+            self.aggregationsData = undefined;            
         })
     }
 

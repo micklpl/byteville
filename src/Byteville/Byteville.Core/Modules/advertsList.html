@@ -41,7 +41,8 @@
         </div>       
     </div>
     <div class="container">
-        <div repeat.for="advert of adverts">
+        <div class="signal" if.bind="waitingForResults"></div>
+        <div if.bind="!waitingForResults" repeat.for="advert of adverts">
             <div class="search-result">
                 <h3 class="ad-title">${advert.title}</h3>
                 <div class="ad-middle-container">

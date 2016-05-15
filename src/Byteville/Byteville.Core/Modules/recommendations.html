@@ -2,7 +2,7 @@
     <require from="./Helpers/date-format"></require>
     <require from="./Helpers/currency-format"></require>
     <require from="./Helpers/date-from-now"></require>
-    <div class="container survey-container" if.bind="results === undefined">
+    <div class="container survey-container" if.bind="results === undefined && !waitingForResults">
         <h2>Ankieta preferencji</h2>
         <span>Postaramy sie znaleźć dla Ciebie optymalne oferty. Potrzebujemy kilka szczegółów na temat Twoich oczekiwań</span>
         <h4>I. Miejsce</h4>
@@ -18,7 +18,8 @@
         <div>
             <input type="button" value="Wyświetl propozycje" class="bv-btn rec-btn" click.delegate="getRecommendations()" />
         </div>
-    </div>    
+    </div>
+    <div class="signal" if.bind="waitingForResults"></div>    
     <div class="container" if.bind="results !== undefined">
         <div repeat.for="advert of results">
             <div class="search-result">

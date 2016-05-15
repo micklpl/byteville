@@ -97,7 +97,6 @@ type AggregationsController(client:ElasticClient) =
         searchRequest.Aggregations <- new AggregationDictionary(dictionary)
 
         let aggs = x.Client.Search<AdvertBase>(searchRequest).Aggs
-
         match aggs.Terms("outer_aggregation").Buckets.ToArray() with
                 | [||] -> x.Ok(aggs.Range("outer_aggregation").Buckets.ToArray()) :> _
                 | terms -> x.Ok(terms) :> _
