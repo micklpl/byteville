@@ -105,7 +105,7 @@ export class AdvertsList{
 
     setInput(value){
         this.params.q = value;
-        filterChanged();
+        this.filterChanged();
     }
 
     resetFilters(){
