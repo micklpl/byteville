@@ -148,10 +148,8 @@ let nameToLocation(name) =
             | :? System.IndexOutOfRangeException -> return None
     }
 
-let classifyAdvert(asyncStream:Async<Stream>) = 
+let parseAndClassify(html: HtmlDocument) = 
     async{
-        let! stream = asyncStream
-        let html = HtmlDocument.Load(stream)
         let ogUrl = html.Descendants("meta")
                     |> Seq.find(fun meta -> meta.HasAttribute("property", "og:url"))
                     |> fun node -> node.Attribute("content").Value()
@@ -165,6 +163,8 @@ let classifyAdvert(asyncStream:Async<Stream>) =
                     | _ -> raise(NoOgUrlException(ogUrl))
             with
                 |  :? IncorrectAdvert -> None
+                |  :? System.Collections.Generic.KeyNotFoundException -> None
+                |  :? System.FormatException -> None
         
         if advert.IsSome && advert.Value.Street.IsNone then
             let street = match tryParseStreetFromTitle(advert.Value.Title) with                            
@@ -191,3 +191,21 @@ let classifyAdvert(asyncStream:Async<Stream>) =
 
         return advert
     }
+
+let classifyAdvert(asyncStream:Async<Stream>) = 
+    async{
+        let! stream = asyncStream
+
+        let html = 
+            try 
+                Some(HtmlDocument.Load(stream))
+            with
+                | :? System.Exception -> None
+
+        if html.IsNone then
+            return None
+        else
+            let! value = parseAndClassify(html.Value)
+            return value         
+    }
+    

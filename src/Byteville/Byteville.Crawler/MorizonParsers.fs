@@ -92,7 +92,10 @@ let morizonAdvertParser(html:HtmlDocument, link:String) =
                     |> Seq.filter(fun pair -> (snd(pair).IsSome))
                     |> Seq.map(fun pair -> (fst(pair), snd(pair).Value))
 
-    let creationDate = System.DateTime.Parse(trySeekMorizonList(listItems, "Opublikowano").Value)
+    let creationDate = match trySeekMorizonList(listItems, "Opublikowano").Value with
+                            | "wczoraj" -> DateTime.Today.AddDays(-1.0)
+                            | "dzisiaj" -> DateTime.Today
+                            |  x -> System.DateTime.Parse(x)
 
     let area = seekMorizonList(listItems, "Powierzchnia")
                     |> fun text -> (text.Split[|' '|]).[0]

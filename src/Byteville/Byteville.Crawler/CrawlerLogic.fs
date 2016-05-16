@@ -43,7 +43,10 @@ let saveFileToDisk(asyncStream:Async<Stream>, md5:string) =
         htmlStream.CopyTo(ms)
         let array = ms.ToArray()
 
-        do! fileStream.AsyncWrite(array, 0, array.Length)
+        try
+            do! fileStream.AsyncWrite(array, 0, array.Length)
+        with
+            | :? System.IO.IOException -> ()
     } 
 
 let crawl pages = 
@@ -59,6 +62,7 @@ let crawl pages =
             |> Seq.collect(fun d-> (d |> Seq.concat))
             |> Seq.map(fun link ->(link, md5(link)))
             |> Seq.sortBy(fun tuple -> snd(tuple))
+            |> Seq.distinct
             |> Seq.map(fun tuple -> (downloadHtmlAsync(fst(tuple)), snd(tuple)))
             |> Seq.map(fun (stream, md5) -> saveFileToDisk(stream, md5))
             |> Async.Parallel
