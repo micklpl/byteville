@@ -160,48 +160,90 @@ type ClassifierTests() =
                         |> Seq.map(fun ad -> ad.Value)
 
         let header = "area;nr_of_rooms;tier;parking;year_of_construction;district_id;price\n"
-        let header = "area;nr_of_rooms;district_id;price\n"
 
-        let tierMedian = adverts |> Seq.choose(fun a -> a.Tier)
-                                 |> Seq.sort|> List.ofSeq 
-                                 |> fun lst -> lst.[lst.Length /2]
-                                 |> System.Int32.Parse          
+        let districts = adverts |> Seq.choose(fun a -> a.District)
+                                |> Seq.distinct
+                                |> Seq.sort
 
-        let nrOfRommsMedian = adverts |> Seq.choose(fun a -> a.NumberOfRooms)
-                                      |> Seq.sort|> List.ofSeq 
-                                      |> fun lst -> lst.[lst.Length /2] 
+        let median(sequence:seq<'a>) = sequence |> Seq.sort
+                                                |> List.ofSeq
+                                                |> fun list -> list.[list.Length/2]
 
-        let yrOfConstMedian = adverts |> Seq.choose(fun a -> a.YearOfConstruction)
-                                      |> Seq.sort|> List.ofSeq 
-                                      |> fun lst -> lst.[lst.Length /2] 
+        let medianOfMap(map:Map<string,int>) = map |> Map.toSeq
+                                                   |> Seq.map(fun pair -> snd(pair))
+                                                   |> median
 
+        let tierMedians = adverts
+                            |> Seq.filter(fun a -> a.District.IsSome && a.Tier.IsSome)
+                            |> Seq.groupBy(fun a -> a.District.Value)
+                            |> Seq.map(
+                                fun (district,values) -> 
+                                    (district, values
+                                                |> Seq.map(fun d -> d.Tier.Value)
+                                                |> median
+                                                |> System.Int32.Parse) 
+                                )                            
+                            |> Map.ofSeq        
 
-        let ppMAvg = adverts |> Seq.groupBy(fun a -> a.District.Value)
-                             |> Seq.map(fun t -> (fst(t), snd(t) 
-                                                    |> Seq.map(fun a -> a.PricePerMeter) 
-                                                    |> Seq.average))
-                             |> Seq.sortBy(fun t -> snd(t))
-                             |> Seq.map(fun t -> fst(t))
-                             |> List.ofSeq
+        let tierMedian = tierMedians |> medianOfMap
+
+        let nrOfRoomsMedians = adverts
+                                |> Seq.filter(fun a -> a.District.IsSome && a.NumberOfRooms.IsSome)
+                                |> Seq.groupBy(fun a -> a.District.Value)
+                                |> Seq.map(
+                                    fun (district,values) -> 
+                                        (district, values
+                                                    |> Seq.map(fun d -> d.NumberOfRooms.Value)
+                                                    |> median) 
+                                    )                            
+                                |> Map.ofSeq
+
+        let nrOfRoomsMedian = nrOfRoomsMedians |> medianOfMap
+
+        let yrOfConstMedians = adverts
+                                |> Seq.filter(fun a -> a.District.IsSome && a.YearOfConstruction.IsSome)
+                                |> Seq.groupBy(fun a -> a.District.Value)
+                                |> Seq.map(
+                                    fun (district,values) -> 
+                                        (district, values
+                                                    |> Seq.map(fun d -> d.YearOfConstruction.Value)
+                                                    |> median) 
+                                    )                            
+                                |> Map.ofSeq
+
+        let yrOfConstMedian = yrOfConstMedians |> medianOfMap
                             
         let evaluateTier(a:Advert) = 
             try
                 match a.Tier with
-                    | None ->  tierMedian
+                    | None ->  match a.District with
+                                   | Some(district) -> tierMedians |> Map.find(district)
+                                   | None -> tierMedian
                     | Some(x) -> match x with
                                    | "parter" -> 0
                                    | _ -> System.Int32.Parse(x)
             with
                 | :? System.FormatException -> 0
+
+        let approximateNumberOfRooms(district) = 
+            match district with
+                | Some(x) -> nrOfRoomsMedians |> Map.find(x)
+                | None -> nrOfRoomsMedian
+
+        let approximateYearOfConstruction(district) = 
+            match district with
+                | Some(x) -> yrOfConstMedians |> Map.find(x)
+                | None -> yrOfConstMedian
         
         let adCsv = adverts 
+                    |> Seq.filter(fun a -> a.District.IsSome)
                     |> Seq.map(fun a -> {
                                         a=a.Area;
-                                        n= if a.NumberOfRooms.IsSome then a.NumberOfRooms.Value else nrOfRommsMedian;
+                                        n= if a.NumberOfRooms.IsSome then a.NumberOfRooms.Value else approximateNumberOfRooms(a.District);
                                         t= evaluateTier a;
-                                        p = if a.Parking.IsSome  then 1 else 0;
-                                        y = if a.YearOfConstruction.IsSome then a.YearOfConstruction.Value else yrOfConstMedian
-                                        l = ppMAvg |> List.findIndex(fun e -> e.Equals(a.District.Value));
+                                        p = if a.Parking.IsSome then 1 else 0;
+                                        y = if a.YearOfConstruction.IsSome then a.YearOfConstruction.Value else approximateYearOfConstruction(a.District);
+                                        l = districts |> Seq.findIndex(fun d -> d = a.District.Value)
                                         tp = a.TotalPrice
                                     })
 
