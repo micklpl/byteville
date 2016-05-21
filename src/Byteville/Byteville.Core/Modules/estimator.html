@@ -1,5 +1,29 @@
 ﻿<template>
-    <h2>Estymator - TODO</h2>
+    <div class="container survey-container" if.bind="estimatedPrice === undefined && !waitingForResults">
+        <h2>Estymator</h2>
+        <span>Wprowadź podstawowe parametry na temat mieszkania, aby uzyskać oszacowanie ceny</span>
+        <h4>I. Dzielnica</h4>
+        <input type="text" value.bind="district" />
+        <h4>II. Powierzchnia [m<sup>2</sup>]</h4>
+        <input type="text" value.bind="area" />
+        <h4>III. Liczba pokoi</h4>
+        <input type="text" value.bind="numberOfRooms" />
+        <h4>IV. Parking</h4>
+        <label for="chkbox1">Czy posiada ?</label>
+        <input id="chkbox1" type="checkbox" checked.bind="remember" />
+        <h4>V. Piętro</h4>
+        <input type="text" value.bind="tier" />
+        <h4>VI. Rok budowy</h4>
+        <input type="text" value.bind="yearOfConstruction" />
+        <div>
+            <input type="button" value="Oszacuj cenę" class="bv-btn est-btn" click.delegate="executeEstimation()" />
+        </div>
+    </div>
+    <div class="signal" if.bind="waitingForResults"></div>
+    <div class="container survey-container" if.bind="estimatedPrice !== undefined && !waitingForResults">
+        <h3>Szacowana cena wynosi: ${estimatedPrice} zł</h3>
+        <input type="button" value="Powrót" class="bv-btn" click.delegate="resetEstimationResult()" />
+    </div>    
 </template>
 
 
