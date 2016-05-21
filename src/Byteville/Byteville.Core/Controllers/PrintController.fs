@@ -15,14 +15,14 @@ open System.Net
 type PrintController() =
     inherit ApiController()
 
-    static let getPdfMakeCode() = 
+    static let GetPdfMakeCode() = 
         let assembly = Assembly.GetExecutingAssembly()
         let name = "print.js"
         use stream = assembly.GetManifestResourceStream(name)
         use reader = new StreamReader(stream)
         reader.ReadToEnd()
 
-    static member val PdfMakeCode = getPdfMakeCode() with get
+    static member val PdfMakeCode = GetPdfMakeCode() with get
 
     member private x.GetAdvertJson(md5:string) = 
         let client = new WebClient();

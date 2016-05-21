@@ -18,6 +18,8 @@
     <TargetFrameworkProfile />
     <WebGreaseLibPath>$(SolutionDir)\packages\WebGrease.1.5.2\lib</WebGreaseLibPath>
     <Name>Byteville.Core</Name>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -178,6 +180,7 @@
     <Compile Include="Controllers\RecommendationsController.fs" />
     <Compile Include="Controllers\PrintController.fs" />
     <Compile Include="Controllers\DistrictStatsController.fs" />
+    <Compile Include="Controllers\EstimationsController.fs" />
     <Content Include="Web.config" />
     <Compile Include="NLogger.fs" />
     <Compile Include="UnityResolver.fs" />
@@ -188,6 +191,7 @@
     <Content Include="Index.html" />
     <Content Include="packages.config" />
     <Content Include="readme.txt" />
+    <EmbeddedResource Include="Items\adverts.csv" />
     <None Include="NLog.xsd" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -215,6 +219,18 @@
     <EmbeddedResource Include="print.js" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Accord">
+      <HintPath>..\packages\Accord.3.0.2\lib\net45\Accord.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Accord.Math">
+      <HintPath>..\packages\Accord.Math.3.0.2\lib\net45\Accord.Math.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Accord.Statistics">
+      <HintPath>..\packages\Accord.Statistics.3.0.2\lib\net45\Accord.Statistics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="EdgeJs">
       <HintPath>..\packages\Edge.js.5.9.1\lib\EdgeJs.dll</HintPath>
       <Private>True</Private>
@@ -297,4 +313,11 @@
     <PreBuildEvent>rem xcopy "$(ProjectDir)node_modules\*.*" "$(SolutionDir)Byteville.Core\bin\node_modules" /Y /I /E
 rem xcopy "$(ProjectDir)fonts\*.*" "C:\\Program Files (x86)\\IIS Express\\fonts" /Y /I /E</PreBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\Accord.3.0.2\build\Accord.targets" Condition="Exists('..\packages\Accord.3.0.2\build\Accord.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Accord.3.0.2\build\Accord.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Accord.3.0.2\build\Accord.targets'))" />
+  </Target>
 </Project>
