@@ -9,6 +9,7 @@ open System.Web.Http.Tracing
 open Newtonsoft.Json
 open Microsoft.Practices.Unity
 open Nest
+open System.Configuration
 
 type HttpRoute = {
     controller : string
@@ -45,7 +46,7 @@ type Global() =
         //Unity
         let container = new UnityContainer()
 
-        let node = new Uri("http://localhost:9200")
+        let node = new Uri(ConfigurationSettings.AppSettings.["ElasticsearchUri"])
         let settings = new ConnectionSettings(node)        
         let client = new ElasticClient(settings.DefaultIndex("adverts"))
         container.RegisterInstance(client) |> ignore

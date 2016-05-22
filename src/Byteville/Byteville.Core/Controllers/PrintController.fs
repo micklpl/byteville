@@ -11,9 +11,12 @@ open System.IO
 open Nest
 open Byteville.Core.Models
 open System.Net
+open System.Configuration
 
 type PrintController() =
     inherit ApiController()
+
+    static let ElasticsearchUri = ConfigurationSettings.AppSettings.["ElasticsearchUri"]
 
     static let GetPdfMakeCode() = 
         let assembly = Assembly.GetExecutingAssembly()
@@ -27,7 +30,7 @@ type PrintController() =
     member private x.GetAdvertJson(md5:string) = 
         let client = new WebClient();
         client.Encoding <- System.Text.Encoding.UTF8
-        client.DownloadString("http://localhost:9200/adverts/_search?q=Md5:" + md5);
+        client.DownloadString(ElasticsearchUri + "adverts/_search?q=Md5:" + md5);
 
     member x.Get([<FromUri>]md5:string) =
         let func = Edge.Func(PrintController.PdfMakeCode)

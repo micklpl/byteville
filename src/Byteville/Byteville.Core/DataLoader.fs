@@ -9,6 +9,7 @@ open Newtonsoft.Json
 open System.Collections.Specialized
 open Byteville.Core.Models
 open Newtonsoft.Json.FSharp
+open System.Configuration
 
 [<CLIMutable>]
 type AdministrationUnit = { Name : String;  AllocationCode: String; District: String }
@@ -21,6 +22,7 @@ type DataLoader() =
     let matchPattern = "(ULICA|ALEJA|OSIEDLE|PLAC)\s(.*)([A-ZŚ]{2})\s(.*)"
     let flawedName = "(.*)(Nr.*)"
     let nameWithBrackets = "(.*)(\(.*)";
+    let elasticsearchUri = ConfigurationSettings.AppSettings.["ElasticsearchUri"]
 
     member x.ParseAdministrationUnit (str: String) =
         let matchResult = Regex.Match(str, matchPattern)
@@ -53,7 +55,7 @@ type DataLoader() =
         matchingLines
 
     member private x.CreateIndex(name, json:string) =
-        let webAddr = "http://localhost:9200/" + name;
+        let webAddr = elasticsearchUri + name;
         let httpWebRequest = WebRequest.Create(webAddr)
         httpWebRequest.ContentType <- "application/json; charset=utf-8";
         httpWebRequest.Method  <- "PUT";   
@@ -73,7 +75,7 @@ type DataLoader() =
         x.CreateIndex("adverts", mapping)
 
     member x.IndexStreets(path: String) =        
-        let node = new Uri("http://localhost:9200")
+        let node = new Uri(elasticsearchUri)
         let settings = new ConnectionSettings(node)        
         let client = new ElasticClient(settings.DefaultIndex("streets"))
         x.CreateStreetsIndex() |> ignore
@@ -84,7 +86,7 @@ type DataLoader() =
             |> ignore
 
     member x.IndexExists(name: String) =
-        let node = new Uri("http://localhost:9200")
+        let node = new Uri(elasticsearchUri)
         let settings = new ConnectionSettings(node)
         let client = new ElasticClient(settings.DefaultIndex(name))
         
@@ -100,6 +102,6 @@ type DataLoader() =
         client.Headers.Add("Content-type: application/json")
 
         adverts |> Seq.map(fun advert -> x.AdvertToJson(advert)) |>
-            Seq.iter(fun json -> client.UploadData("http://localhost:9200/adverts/advert/", 
+            Seq.iter(fun json -> client.UploadData(elasticsearchUri + "adverts/advert/", 
                                     "POST", json) |> ignore)
 

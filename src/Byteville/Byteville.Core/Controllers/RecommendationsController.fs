@@ -23,11 +23,6 @@ type RecommendationsQueryModel() =
 type RecommendationsController(client:ElasticClient) =
     inherit ApiController()
 
-    let GetElasticClient(index) = 
-        let node = new Uri("http://localhost:9200")
-        let settings = new ConnectionSettings(node)        
-        new ElasticClient(settings.DefaultIndex(index))
-
     let CreateNameField(name) =
         let field = new Field()
         field.Name <- name

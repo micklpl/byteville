@@ -8,6 +8,7 @@ open Newtonsoft.Json
 open Byteville.Core
 open Nest
 open Byteville.Core.Models
+open System.Configuration
 
 type SearchController() =
     inherit ApiController()
@@ -37,7 +38,7 @@ type SearchController() =
         req
 
     let GetElasticClient(index) = 
-        let node = new Uri("http://localhost:9200")
+        let node = new Uri(ConfigurationSettings.AppSettings.["ElasticsearchUri"])
         let settings = new ConnectionSettings(node)        
         new ElasticClient(settings.DefaultIndex(index))
 
