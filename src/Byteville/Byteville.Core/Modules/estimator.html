@@ -1,9 +1,12 @@
 ﻿<template>
+    <require from="./Helpers/select2-custom-attribute"></require>
     <div class="container survey-container" if.bind="estimatedPrice === undefined && !waitingForResults">
         <h2>Estymator</h2>
         <span>Wprowadź podstawowe parametry na temat mieszkania, aby uzyskać oszacowanie ceny</span>
         <h4>I. Dzielnica</h4>
-        <input type="text" value.bind="district" />
+        <select id="districtSelect" select2 value.bind="district">
+            <option repeat.for="d of districts" model.bind="d">${d}</option>
+        </select>
         <h4>II. Powierzchnia [m<sup>2</sup>]</h4>
         <input type="text" value.bind="area" />
         <h4>III. Liczba pokoi</h4>

@@ -115,6 +115,8 @@
     <Content Include="Content\refresh-arrow.svg" />
     <None Include="Content\site.png" />
     <None Include="Content\pdf.png" />
+    <Content Include="Content\select2.min.css" />
+    <Content Include="Content\select2.min.js" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.css.map" />
@@ -125,6 +127,7 @@
     <Content Include="Modules\Helpers\date-from-now.js" />
     <Content Include="Modules\Helpers\currency-format.js" />
     <Content Include="Modules\Helpers\date-format.js" />
+    <Content Include="Modules\Helpers\select2-custom-attribute.js" />
     <Content Include="Modules\streetsSearch.js" />
     <Content Include="Modules\districtDetails.js" />
     <Content Include="Modules\districtDetails.html" />
