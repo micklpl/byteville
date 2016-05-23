@@ -14,3 +14,4 @@ src/DataStorage/
 src/Byteville/Byteville.Core/jspm_packages/
 src/Byteville/Byteville.Core/node_modules/
 src/Byteville/Byteville.Core/npm-debug.log
+src/Byteville/Byteville.Core/dist/
